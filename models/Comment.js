@@ -1,15 +1,20 @@
+// FILE: /models/Comment.js
 const mongoose = require('mongoose');
 
 const CommentSchema = new mongoose.Schema({
-  softwareId: {
+  postId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Software',
+    ref: 'Post',
+    required: true
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true
   },
   username: {
     type: String,
-    required: true,
-    trim: true
+    required: true
   },
   content: {
     type: String,

@@ -1,17 +1,22 @@
+// FILE: /public/js/search.js
 document.addEventListener('DOMContentLoaded', () => {
   // DOM elements
   const searchTitle = document.getElementById('search-title');
   const searchResults = document.getElementById('search-results');
   const tagFilters = document.getElementById('tag-filters');
   const pagination = document.getElementById('pagination');
+  const categoryFilter = document.getElementById('category-filter');
   const sortSelect = document.getElementById('sort-select');
   const searchInput = document.getElementById('search-input');
   const searchButton = document.getElementById('search-button');
+  const navLinks = document.getElementById('nav-links');
+  const uploadLink = document.getElementById('upload-link');
 
   // Get query parameters
   const urlParams = new URLSearchParams(window.location.search);
   const query = urlParams.get('q');
   const tag = urlParams.get('tag');
+  const category = urlParams.get('category');
   const page = parseInt(urlParams.get('page')) || 1;
   const sort = urlParams.get('sort') || 'newest';
 
@@ -20,19 +25,96 @@ document.addEventListener('DOMContentLoaded', () => {
     sortSelect.value = sort;
   }
 
+  // Set initial category filter value
+  if (categoryFilter && category) {
+    categoryFilter.value = category;
+  }
+
   // Update search input with query
   if (query && searchInput) {
     searchInput.value = query;
   }
+
+  // Check if user is logged in
+  const checkAuth = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        updateNavLinks(false);
+        return;
+      }
+      
+      const response = await fetch('/api/auth/user', {
+        headers: {
+          'x-auth-token': token
+        }
+      });
+      
+      if (!response.ok) {
+        localStorage.removeItem('token');
+        updateNavLinks(false);
+        return;
+      }
+      
+      const userData = await response.json();
+      updateNavLinks(true, userData);
+    } catch (error) {
+      console.error('Auth check error:', error);
+      updateNavLinks(false);
+    }
+  };
+
+  // Update navigation links based on auth status
+  const updateNavLinks = (isLoggedIn, user = null) => {
+    if (isLoggedIn && user) {
+      navLinks.innerHTML = `
+        <a href="/upload" class="nav-link">Upload</a>
+        <a href="/user/${user.username}" class="nav-link">Profile</a>
+        <button id="logout-btn" class="nav-link">Logout</button>
+      `;
+      
+      // Add logout event listener
+      document.getElementById('logout-btn').addEventListener('click', () => {
+        localStorage.removeItem('token');
+        window.location.reload();
+      });
+    } else {
+      navLinks.innerHTML = `
+        <a href="/login" class="nav-link">Login</a>
+        <a href="/register" class="nav-link">Register</a>
+      `;
+    }
+  };
 
   // Update page title based on search type
   if (query) {
     searchTitle.textContent = `Search Results for "${query}"`;
     document.title = `Search: ${query} - Simily`;
   } else if (tag) {
-    searchTitle.textContent = `Software Tagged with "${tag}"`;
+    searchTitle.textContent = `Posts Tagged with "${tag}"`;
     document.title = `Tag: ${tag} - Simily`;
+  } else if (category) {
+    searchTitle.textContent = `${category} Posts`;
+    document.title = `${category} - Simily`;
   }
+
+  // Fetch categories for filter
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/categories');
+      const categories = await response.json();
+      
+      let options = '<option value="all">All Categories</option>';
+      categories.forEach(cat => {
+        options += `<option value="${cat.name}" ${category === cat.name ? 'selected' : ''}>${cat.name}</option>`;
+      });
+      
+      categoryFilter.innerHTML = options;
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
 
   // Fetch search results
   const fetchSearchResults = async () => {
@@ -40,53 +122,43 @@ document.addEventListener('DOMContentLoaded', () => {
       searchResults.innerHTML = '<div class="loading">Loading...</div>';
       
       let url;
+      const params = new URLSearchParams();
+      
       if (query) {
-        url = `/api/search?q=${encodeURIComponent(query)}`;
+        params.append('q', query);
       } else if (tag) {
-        url = `/api/search?tag=${encodeURIComponent(tag)}`;
-      } else {
-        url = `/api/software?page=${page}&limit=12`;
+        params.append('tag', tag);
+      } else if (category && category !== 'all') {
+        params.append('category', category);
       }
+      
+      params.append('page', page);
+      params.append('sort', sort);
+      
+      url = `/api/posts/search?${params.toString()}`;
       
       const response = await fetch(url);
       const data = await response.json();
       
-      let software;
-      let totalPages = 1;
-      let currentPage = 1;
+      const posts = data.posts || [];
+      const totalPages = data.totalPages || 1;
+      const currentPage = data.currentPage || 1;
       
-      if (data.software) {
-        // Paginated response
-        software = data.software;
-        totalPages = data.totalPages;
-        currentPage = data.currentPage;
-      } else {
-        // Search results
-        software = data;
-      }
-      
-      if (software.length === 0) {
-        searchResults.innerHTML = '<div class="empty-state">No software found matching your criteria.</div>';
+      if (posts.length === 0) {
+        searchResults.innerHTML = '<div class="empty-state">No posts found matching your criteria.</div>';
         return;
-      }
-      
-      // Sort results if needed
-      if (sort === 'popular') {
-        software.sort((a, b) => b.downloads - a.downloads);
-      } else {
-        software.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       }
       
       // Render results
       let resultsHTML = '';
-      software.forEach(item => {
-        resultsHTML += createSoftwareCard(item);
+      posts.forEach(post => {
+        resultsHTML += createPostCard(post);
       });
       
       searchResults.innerHTML = resultsHTML;
       
       // Render pagination if needed
-      if (!query && !tag && totalPages > 1) {
+      if (totalPages > 1) {
         renderPagination(currentPage, totalPages);
       } else {
         pagination.innerHTML = '';
@@ -94,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Extract and display unique tags for filtering
       if (!tag) {
-        renderTagFilters(software);
+        renderTagFilters(posts);
       }
     } catch (error) {
       console.error('Error fetching search results:', error);
@@ -102,22 +174,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // Create HTML for a software card
-  const createSoftwareCard = (software) => {
-    const tags = software.tags.slice(0, 3).map(tag => 
+  // Create HTML for a post card
+  const createPostCard = (post) => {
+    const tags = post.tags.slice(0, 3).map(tag => 
       `<span class="tag">${tag}</span>`
     ).join('');
 
     return `
-      <div class="software-card">
-        <img src="${software.imageUrl}" alt="${software.title}" class="software-image">
-        <div class="software-info">
-          <h3 class="software-title">${software.title}</h3>
-          <p class="software-description">${truncateText(software.description, 100)}</p>
-          <div class="software-tags">
+      <div class="post-card">
+        <div class="post-votes">
+          <span class="vote-count">${post.upvotes - post.downvotes}</span>
+        </div>
+        <img src="${post.imageUrl}" alt="${post.title}" class="post-image">
+        <div class="post-info">
+          <div class="post-meta">
+            <span class="post-category">${post.category}</span>
+            <span class="post-author">by ${post.author.username}</span>
+          </div>
+          <h3 class="post-title">${post.title}</h3>
+          <p class="post-description">${truncateText(post.description, 100)}</p>
+          <div class="post-tags">
             ${tags}
           </div>
-          <a href="/software/${software._id}" class="view-btn">View Details</a>
+          <a href="/post/${post.slug}" class="view-btn">View Details</a>
         </div>
       </div>
     `;
@@ -173,9 +252,9 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // Render tag filters
-  const renderTagFilters = (software) => {
+  const renderTagFilters = (posts) => {
     // Extract unique tags
-    const allTags = software.flatMap(item => item.tags);
+    const allTags = posts.flatMap(post => post.tags);
     const uniqueTags = [...new Set(allTags)].slice(0, 15); // Limit to 15 tags
     
     if (uniqueTags.length === 0) {
@@ -192,11 +271,28 @@ document.addEventListener('DOMContentLoaded', () => {
     tagFilters.innerHTML = tagsHTML;
   };
 
+  // Handle category filter change
+  if (categoryFilter) {
+    categoryFilter.addEventListener('change', () => {
+      const url = new URL(window.location);
+      
+      if (categoryFilter.value === 'all') {
+        url.searchParams.delete('category');
+      } else {
+        url.searchParams.set('category', categoryFilter.value);
+      }
+      
+      url.searchParams.delete('page'); // Reset to page 1
+      window.location.href = url.toString();
+    });
+  }
+
   // Handle sort change
   if (sortSelect) {
     sortSelect.addEventListener('change', () => {
       const url = new URL(window.location);
       url.searchParams.set('sort', sortSelect.value);
+      url.searchParams.delete('page'); // Reset to page 1
       window.location.href = url.toString();
     });
   }
@@ -217,5 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Initialize page
+  checkAuth();
+  if (categoryFilter) fetchCategories();
   fetchSearchResults();
 });
