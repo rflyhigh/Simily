@@ -657,3 +657,205 @@
   from { opacity: 0; transform: translateX(30px); }
   to { opacity: 1; transform: translateX(0); }
 }
+/* Improved Download Groups */
+.download-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.download-group {
+  background-color: var(--bg-tertiary);
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all var(--transition-medium);
+}
+
+.download-group:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.download-group-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-color);
+  margin: 0;
+  flex: 1;
+}
+
+.group-toggle {
+  background: none;
+  border: none;
+  color: var(--accent-color);
+  cursor: pointer;
+  font-size: 18px;
+  transition: transform var(--transition-medium);
+}
+
+.download-links-container {
+  margin-top: 12px;
+  display: none;
+}
+
+.download-links-container.active {
+  display: block;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.download-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.download-link {
+  display: inline-block;
+  padding: 10px 15px;
+  background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all var(--transition-medium);
+  box-shadow: 0 3px 8px rgba(108, 92, 231, 0.3);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.download-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(108, 92, 231, 0.4);
+}
+
+.copy-all-btn {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background-color: var(--bg-secondary);
+  color: var(--accent-color);
+  border: 1px dashed var(--accent-color);
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all var(--transition-medium);
+}
+
+.copy-all-btn:hover {
+  background-color: rgba(108, 92, 231, 0.1);
+  transform: translateY(-2px);
+}
+
+.copy-all-btn:active {
+  transform: translateY(1px);
+}
+
+.copy-success {
+  color: var(--success-color);
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Fix for image container */
+.detail-image-container {
+  width: 40%;
+  height: 400px;
+  min-height: 400px;
+  max-height: 400px;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.detail-content {
+  width: 60%;
+  height: auto;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+}
+
+@media (max-width: 1024px) {
+  .software-detail {
+    flex-direction: column;
+  }
+  
+  .detail-image-container {
+    width: 100%;
+    height: 300px;
+    min-height: 300px;
+    max-height: 300px;
+  }
+  
+  .detail-content {
+    width: 100%;
+    max-height: none;
+  }
+  
+  .download-links {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .detail-image-container {
+    height: 250px;
+    min-height: 250px;
+    max-height: 250px;
+  }
+  
+  .download-links {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .detail-image-container {
+    height: 200px;
+    min-height: 200px;
+    max-height: 200px;
+  }
+  
+  .download-links {
+    grid-template-columns: 1fr;
+  }
+}
+.copy-all-btn {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  background-color: var(--bg-secondary);
+  color: var(--accent-color);
+  border: 1px dashed var(--accent-color);
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all var(--transition-medium);
+}
+
+.copy-all-btn:hover {
+  background-color: rgba(108, 92, 231, 0.1);
+  transform: translateY(-2px);
+}
+
+.copy-all-btn:active {
+  transform: translateY(1px);
+}
