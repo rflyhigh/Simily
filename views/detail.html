@@ -1,10 +1,9 @@
-<!-- FILE: detail.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Post Details - Simily</title>
+  <title>Software Details - Simily</title>
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="/css/detail.css">
   <link rel="icon" href="/img/favicon.ico">
@@ -17,11 +16,8 @@
       </div>
       <nav>
         <div class="search-container">
-          <input type="text" id="search-input" placeholder="Search...">
+          <input type="text" id="search-input" placeholder="Search software...">
           <button id="search-button">Search</button>
-        </div>
-        <div class="nav-links" id="nav-links">
-          <!-- User links will be loaded here -->
         </div>
       </nav>
     </div>
@@ -33,15 +29,26 @@
         <a href="javascript:history.back()">← Back</a>
       </div>
 
-      <section id="post-detail" class="post-detail">
-        <!-- Post details will be loaded here -->
+      <section id="software-detail" class="software-detail">
+        <!-- Software details will be loaded here -->
       </section>
 
       <section class="comments-section">
         <h2>Comments</h2>
         
-        <div id="comment-form-container">
-          <!-- Comment form will be loaded here if user is logged in -->
+        <div class="comment-form">
+          <h3>Add a Comment</h3>
+          <form id="comment-form">
+            <div class="form-group">
+              <label for="username">Username</label>
+              <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+              <label for="content">Comment</label>
+              <textarea id="content" name="content" rows="4" required></textarea>
+            </div>
+            <button type="submit" class="btn">Post Comment</button>
+          </form>
         </div>
 
         <div id="comments-list" class="comments-list">

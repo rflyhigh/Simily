@@ -1,74 +1,18 @@
-// FILE: /public/js/main.js
 document.addEventListener('DOMContentLoaded', () => {
   // DOM elements
   const noticesSection = document.getElementById('notices');
-  const recentPostsGrid = document.getElementById('recent-posts');
-  const popularPostsGrid = document.getElementById('popular-posts');
-  const categoriesList = document.getElementById('categories-list');
+  const recentSoftwareGrid = document.getElementById('recent-software');
+  const popularSoftwareGrid = document.getElementById('popular-software');
   const filterButtons = document.querySelectorAll('.filter-btn');
   const searchInput = document.getElementById('search-input');
   const searchButton = document.getElementById('search-button');
-  const navLinks = document.getElementById('nav-links');
-  const uploadLink = document.getElementById('upload-link');
 
-  // Current filter period for popular posts
+  // Current filter period for popular software
   let currentPeriod = 'all';
-
-  // Check if user is logged in
-  const checkAuth = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      
-      if (!token) {
-        updateNavLinks(false);
-        return;
-      }
-      
-      const response = await fetch('/api/auth/user', {
-        headers: {
-          'x-auth-token': token
-        }
-      });
-      
-      if (!response.ok) {
-        localStorage.removeItem('token');
-        updateNavLinks(false);
-        return;
-      }
-      
-      const userData = await response.json();
-      updateNavLinks(true, userData);
-    } catch (error) {
-      console.error('Auth check error:', error);
-      updateNavLinks(false);
-    }
-  };
-
-  // Update navigation links based on auth status
-  const updateNavLinks = (isLoggedIn, user = null) => {
-    if (isLoggedIn && user) {
-      navLinks.innerHTML = `
-        <a href="/upload" class="nav-link">Upload</a>
-        <a href="/user/${user.username}" class="nav-link">Profile</a>
-        <button id="logout-btn" class="nav-link">Logout</button>
-      `;
-      
-      // Add logout event listener
-      document.getElementById('logout-btn').addEventListener('click', () => {
-        localStorage.removeItem('token');
-        window.location.reload();
-      });
-    } else {
-      navLinks.innerHTML = `
-        <a href="/login" class="nav-link">Login</a>
-        <a href="/register" class="nav-link">Register</a>
-      `;
-    }
-  };
 
   // Add animation to elements when they come into view
   const animateOnScroll = () => {
-    const elements = document.querySelectorAll('.post-card, .section-header, .notice, .category-item');
+    const elements = document.querySelectorAll('.software-card, .section-header, .notice');
     
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -116,128 +60,74 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // Fetch and display recent posts
-  const fetchRecentPosts = async () => {
+  // Fetch and display recent software
+  const fetchRecentSoftware = async () => {
     try {
-      recentPostsGrid.innerHTML = '<div class="loading">Loading recent posts...</div>';
+      recentSoftwareGrid.innerHTML = '<div class="loading">Loading recent software...</div>';
       
-      const response = await fetch('/api/posts/recent');
-      const posts = await response.json();
+      const response = await fetch('/api/software/recent');
+      const software = await response.json();
 
-      if (posts.length === 0) {
-        recentPostsGrid.innerHTML = '<div class="empty-state">No posts available yet.</div>';
+      if (software.length === 0) {
+        recentSoftwareGrid.innerHTML = '<div class="empty-state">No software available yet.</div>';
         return;
       }
 
-      let postsHTML = '';
-      posts.forEach(post => {
-        postsHTML += createPostCard(post);
+      let softwareHTML = '';
+      software.forEach(item => {
+        softwareHTML += createSoftwareCard(item);
       });
 
-      recentPostsGrid.innerHTML = postsHTML;
+      recentSoftwareGrid.innerHTML = softwareHTML;
       animateOnScroll();
     } catch (error) {
-      console.error('Error fetching recent posts:', error);
-      recentPostsGrid.innerHTML = '<div class="error-message">Failed to load recent posts.</div>';
+      console.error('Error fetching recent software:', error);
+      recentSoftwareGrid.innerHTML = '<div class="error-message">Failed to load recent software.</div>';
     }
   };
 
-  // Fetch and display popular posts
-  const fetchPopularPosts = async (period = 'all') => {
+  // Fetch and display popular software
+  const fetchPopularSoftware = async (period = 'all') => {
     try {
-      popularPostsGrid.innerHTML = '<div class="loading">Loading popular posts...</div>';
+      popularSoftwareGrid.innerHTML = '<div class="loading">Loading popular software...</div>';
       
-      const response = await fetch(`/api/posts/popular?period=${period}`);
-      const posts = await response.json();
+      const response = await fetch(`/api/software/popular?period=${period}`);
+      const software = await response.json();
 
-      if (posts.length === 0) {
-        popularPostsGrid.innerHTML = '<div class="empty-state">No posts available yet.</div>';
+      if (software.length === 0) {
+        popularSoftwareGrid.innerHTML = '<div class="empty-state">No software available yet.</div>';
         return;
       }
 
-      let postsHTML = '';
-      posts.forEach(post => {
-        postsHTML += createPostCard(post);
+      let softwareHTML = '';
+      software.forEach(item => {
+        softwareHTML += createSoftwareCard(item);
       });
 
-      popularPostsGrid.innerHTML = postsHTML;
+      popularSoftwareGrid.innerHTML = softwareHTML;
       animateOnScroll();
     } catch (error) {
-      console.error('Error fetching popular posts:', error);
-      popularPostsGrid.innerHTML = '<div class="error-message">Failed to load popular posts.</div>';
+      console.error('Error fetching popular software:', error);
+      popularSoftwareGrid.innerHTML = '<div class="error-message">Failed to load popular software.</div>';
     }
   };
 
-  // Fetch and display categories
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch('/api/categories');
-      const categories = await response.json();
-
-      if (categories.length === 0) {
-        categoriesList.innerHTML = '<div class="empty-state">No categories available yet.</div>';
-        return;
-      }
-
-      let categoriesHTML = '';
-      categories.forEach(category => {
-        categoriesHTML += `
-          <a href="/search?category=${encodeURIComponent(category.name)}" class="category-item">
-            <div class="category-icon">${getCategoryIcon(category.name)}</div>
-            <div class="category-info">
-              <h3 class="category-name">${category.name}</h3>
-              <span class="category-count">${category.count} posts</span>
-            </div>
-          </a>
-        `;
-      });
-
-      categoriesList.innerHTML = categoriesHTML;
-      animateOnScroll();
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      categoriesList.innerHTML = '<div class="error-message">Failed to load categories.</div>';
-    }
-  };
-
-  // Get icon for category
-  const getCategoryIcon = (category) => {
-    const icons = {
-      'software': '💻',
-      'game': '🎮',
-      'movie': '🎬',
-      'music': '🎵',
-      'book': '📚',
-      'tutorial': '📝',
-      'other': '📦'
-    };
-    
-    return icons[category.toLowerCase()] || '📦';
-  };
-
-  // Create HTML for a post card
-  const createPostCard = (post) => {
-    const tags = post.tags.slice(0, 3).map(tag => 
+  // Create HTML for a software card
+  const createSoftwareCard = (software) => {
+    const tags = software.tags.slice(0, 3).map(tag => 
       `<span class="tag">${tag}</span>`
     ).join('');
 
     return `
-      <div class="post-card">
-        <div class="post-votes">
-          <span class="vote-count">${post.upvotes - post.downvotes}</span>
-        </div>
-        <img src="${post.imageUrl}" alt="${post.title}" class="post-image">
-        <div class="post-info">
-          <div class="post-meta">
-            <span class="post-category">${post.category}</span>
-            <span class="post-author">by ${post.author.username}</span>
-          </div>
-          <h3 class="post-title">${post.title}</h3>
-          <p class="post-description">${truncateText(post.description, 100)}</p>
-          <div class="post-tags">
+      <div class="software-card">
+        <img src="${software.imageUrl}" alt="${software.title}" class="software-image">
+        <div class="software-info">
+          <h3 class="software-title">${software.title}</h3>
+          <p class="software-description">${truncateText(software.description, 100)}</p>
+          <div class="software-tags">
             ${tags}
           </div>
-          <a href="/post/${post.slug}" class="view-btn">View Details</a>
+          <a href="/software/${software._id}" class="view-btn">View Details</a>
         </div>
       </div>
     `;
@@ -268,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Update current period and fetch data
       currentPeriod = period;
-      fetchPopularPosts(period);
+      fetchPopularSoftware(period);
     });
   });
 
@@ -300,9 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Initialize page
-  checkAuth();
   fetchNotices();
-  fetchRecentPosts();
-  fetchPopularPosts(currentPeriod);
-  fetchCategories();
+  fetchRecentSoftware();
+  fetchPopularSoftware(currentPeriod);
 });

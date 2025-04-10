@@ -1,49 +1,94 @@
-// FILE: admin.js
 document.addEventListener('DOMContentLoaded', () => {
   // DOM elements
+  const adminLoginSection = document.getElementById('admin-login');
+  const adminSections = document.querySelectorAll('.admin-section:not(#admin-login)');
   const adminNav = document.querySelector('.admin-nav');
-  const postsSection = document.getElementById('posts-section');
-  const usersSection = document.getElementById('users-section');
+  const softwareSection = document.getElementById('software-section');
   const noticesSection = document.getElementById('notices-section');
   const commentsSection = document.getElementById('comments-section');
-  const reportsSection = document.getElementById('reports-section');
   const navButtons = document.querySelectorAll('.nav-btn');
+  const loginForm = document.getElementById('login-form');
+  const softwareForm = document.getElementById('software-form');
   const noticeForm = document.getElementById('notice-form');
+  const addSoftwareBtn = document.getElementById('add-software-btn');
+  const cancelSoftwareBtn = document.getElementById('cancel-software-btn');
+  const softwareFormContainer = document.getElementById('software-form-container');
   const addNoticeBtn = document.getElementById('add-notice-btn');
   const cancelNoticeBtn = document.getElementById('cancel-notice-btn');
   const noticeFormContainer = document.getElementById('notice-form-container');
+  const softwareList = document.getElementById('software-list');
   const noticeList = document.getElementById('notice-list');
-  const postsList = document.getElementById('posts-list');
-  const usersList = document.getElementById('users-list');
   const commentsList = document.getElementById('comments-list');
-  const reportsList = document.getElementById('reports-list');
-  const logoutBtn = document.getElementById('logout-btn');
-  const postStatusFilter = document.getElementById('post-status-filter');
-  const postCategoryFilter = document.getElementById('post-category-filter');
-  const postSearch = document.getElementById('post-search');
-  const userStatusFilter = document.getElementById('user-status-filter');
-  const userSearch = document.getElementById('user-search');
-  const commentStatusFilter = document.getElementById('comment-status-filter');
-  const commentPostFilter = document.getElementById('comment-post-filter');
+  const addGroupBtn = document.getElementById('add-group-btn');
+  const downloadGroupsContainer = document.getElementById('download-groups-container');
   const commentSearch = document.getElementById('comment-search');
-  const reportStatusFilter = document.getElementById('report-status-filter');
-  const reportTypeFilter = document.getElementById('report-type-filter');
+  const bulkDeleteBtn = document.getElementById('bulk-delete-comments');
+  const commentSoftwareFilter = document.getElementById('comment-software-filter');
+  const adminSearchInput = document.getElementById('admin-search-input');
+  const adminSearchButton = document.getElementById('admin-search-button');
 
   // Admin token
   let adminToken = localStorage.getItem('adminToken');
 
   // Check if admin is logged in
-  if (!adminToken) {
-    window.location.href = '/admin/login';
-    return;
-  }
+  const checkAuth = () => {
+    if (adminToken) {
+      adminLoginSection.classList.add('hidden');
+      adminNav.classList.remove('hidden');
+      
+      // Show first section by default
+      softwareSection.classList.remove('hidden');
+      
+      // Activate first nav button
+      navButtons[0].classList.add('active');
+      
+      // Load software data
+      fetchSoftware();
+    } else {
+      adminLoginSection.classList.remove('hidden');
+      adminNav.classList.add('hidden');
+      adminSections.forEach(section => {
+        if (section.id !== 'admin-login') {
+          section.classList.add('hidden');
+        }
+      });
+    }
+  };
 
-// FILE: /public/js/admin.js (continued)
-  // Handle logout
-  logoutBtn.addEventListener('click', () => {
-    localStorage.removeItem('adminToken');
-    window.location.href = '/admin/login';
-  });
+  // Handle login form submission
+  if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const token = document.getElementById('admin-token').value.trim();
+      
+      if (!token) {
+        alert('Please enter admin token');
+        return;
+      }
+      
+      try {
+        // Test the token with a simple API call
+        const response = await fetch('/admin/api/software', {
+          headers: {
+            'x-auth-token': token
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error('Invalid token');
+        }
+        
+        // Store token and update UI
+        localStorage.setItem('adminToken', token);
+        adminToken = token;
+        checkAuth();
+      } catch (error) {
+        console.error('Login error:', error);
+        alert('Invalid admin token');
+      }
+    });
+  }
 
   // Handle navigation between sections
   navButtons.forEach(button => {
@@ -55,167 +100,98 @@ document.addEventListener('DOMContentLoaded', () => {
       button.classList.add('active');
       
       // Hide all sections
-      postsSection.classList.add('hidden');
-      usersSection.classList.add('hidden');
+      softwareSection.classList.add('hidden');
       noticesSection.classList.add('hidden');
       commentsSection.classList.add('hidden');
-      reportsSection.classList.add('hidden');
       
       // Show selected section
-      if (section === 'posts') {
-        postsSection.classList.remove('hidden');
-        fetchPosts();
-      } else if (section === 'users') {
-        usersSection.classList.remove('hidden');
-        fetchUsers();
+      if (section === 'software') {
+        softwareSection.classList.remove('hidden');
+        fetchSoftware();
       } else if (section === 'notices') {
         noticesSection.classList.remove('hidden');
         fetchNotices();
       } else if (section === 'comments') {
         commentsSection.classList.remove('hidden');
         fetchComments();
-        fetchPostsForCommentFilter();
-      } else if (section === 'reports') {
-        reportsSection.classList.remove('hidden');
-        fetchReports();
+        fetchSoftwareForCommentFilter();
       }
     });
   });
 
-  // Fetch posts list
-  const fetchPosts = async () => {
+  // Fetch software list for comment filter dropdown
+  const fetchSoftwareForCommentFilter = async () => {
     try {
-      const status = postStatusFilter.value;
-      const category = postCategoryFilter.value;
-      const searchQuery = postSearch.value.trim();
-      
-      let url = '/admin/api/posts';
-      const params = new URLSearchParams();
-      
-      if (status !== 'all') params.append('status', status);
-      if (category !== 'all') params.append('category', category);
-      if (searchQuery) params.append('search', searchQuery);
-      
-      const queryString = params.toString();
-      if (queryString) url += `?${queryString}`;
-      
-      postsList.innerHTML = '<div class="loading">Loading...</div>';
-      
-      const response = await fetch(url, {
+      const response = await fetch('/admin/api/software', {
         headers: {
           'x-auth-token': adminToken
         }
       });
       
       if (!response.ok) {
-        throw new Error('Failed to fetch posts');
+        throw new Error('Failed to fetch software');
       }
       
-      const posts = await response.json();
+      const software = await response.json();
       
-      if (posts.length === 0) {
-        postsList.innerHTML = '<div class="empty-state">No posts found.</div>';
-        return;
-      }
-      
-      let postsHTML = '';
-      posts.forEach(post => {
-        const date = new Date(post.createdAt).toLocaleDateString();
-        const statusClass = post.status === 'active' ? 'status-active' : 
-                           post.status === 'held' ? 'status-held' : 'status-deleted';
-        
-        postsHTML += `
-          <div class="admin-item">
-            <div class="admin-item-info">
-              <h3 class="admin-item-title">${post.title}</h3>
-              <div class="admin-item-meta">
-                By: ${post.author.username} | Added: ${date} | Views: ${post.views} | 
-                Upvotes: ${post.upvotes} | Downvotes: ${post.downvotes} |
-                <span class="status-badge ${statusClass}">${post.status}</span>
-              </div>
-            </div>
-            <div class="admin-item-actions">
-              <button class="btn-small" onclick="viewPost('${post._id}')">View</button>
-              ${post.status === 'active' ? 
-                `<button class="btn-small" onclick="holdPost('${post._id}')">Hold</button>` : 
-                post.status === 'held' ? 
-                `<button class="btn-small" onclick="approvePost('${post._id}')">Approve</button>` : ''}
-              <button class="delete-btn" onclick="deletePost('${post._id}')">Delete</button>
-            </div>
-          </div>
-        `;
+      let options = '<option value="">All Software</option>';
+      software.forEach(item => {
+        options += `<option value="${item._id}">${item.title}</option>`;
       });
       
-      postsList.innerHTML = postsHTML;
+      if (commentSoftwareFilter) {
+        commentSoftwareFilter.innerHTML = options;
+      }
     } catch (error) {
-      console.error('Error fetching posts:', error);
-      postsList.innerHTML = '<div class="error-message">Failed to load posts.</div>';
+      console.error('Error fetching software for filter:', error);
     }
   };
 
-  // Fetch users list
-  const fetchUsers = async () => {
+  // Fetch software list
+  const fetchSoftware = async () => {
     try {
-      const status = userStatusFilter.value;
-      const searchQuery = userSearch.value.trim();
+      softwareList.innerHTML = '<div class="loading">Loading...</div>';
       
-      let url = '/admin/api/users';
-      const params = new URLSearchParams();
-      
-      if (status !== 'all') params.append('status', status);
-      if (searchQuery) params.append('search', searchQuery);
-      
-      const queryString = params.toString();
-      if (queryString) url += `?${queryString}`;
-      
-      usersList.innerHTML = '<div class="loading">Loading...</div>';
-      
-      const response = await fetch(url, {
+      const response = await fetch('/admin/api/software', {
         headers: {
           'x-auth-token': adminToken
         }
       });
       
       if (!response.ok) {
-        throw new Error('Failed to fetch users');
+        throw new Error('Failed to fetch software');
       }
       
-      const users = await response.json();
+      const software = await response.json();
       
-      if (users.length === 0) {
-        usersList.innerHTML = '<div class="empty-state">No users found.</div>';
+      if (software.length === 0) {
+        softwareList.innerHTML = '<div class="empty-state">No software available yet.</div>';
         return;
       }
       
-      let usersHTML = '';
-      users.forEach(user => {
-        const joinDate = new Date(user.createdAt).toLocaleDateString();
-        const statusClass = user.status === 'active' ? 'status-active' : 'status-blocked';
-        
-        usersHTML += `
+      let softwareHTML = '';
+      software.forEach(item => {
+        const date = new Date(item.createdAt).toLocaleDateString();
+        softwareHTML += `
           <div class="admin-item">
             <div class="admin-item-info">
-              <h3 class="admin-item-title">${user.username}</h3>
+              <h3 class="admin-item-title">${item.title}</h3>
               <div class="admin-item-meta">
-                Joined: ${joinDate} | Posts: ${user.postCount} | Comments: ${user.commentCount} | 
-                Reputation: ${user.reputation} |
-                <span class="status-badge ${statusClass}">${user.status}</span>
+                Added: ${date} | Views: ${item.views} | Downloads: ${item.downloads}
               </div>
             </div>
             <div class="admin-item-actions">
-              <button class="btn-small" onclick="viewUserProfile('${user._id}')">View Profile</button>
-              ${user.status === 'active' ? 
-                `<button class="btn-small" onclick="blockUser('${user._id}')">Block</button>` : 
-                `<button class="btn-small" onclick="unblockUser('${user._id}')">Unblock</button>`}
+              <button class="edit-btn" onclick="editSoftware('${item._id}')">Edit</button>
+              <button class="delete-btn" onclick="deleteSoftware('${item._id}')">Delete</button>
             </div>
           </div>
         `;
       });
       
-      usersList.innerHTML = usersHTML;
+      softwareList.innerHTML = softwareHTML;
     } catch (error) {
-      console.error('Error fetching users:', error);
-      usersList.innerHTML = '<div class="error-message">Failed to load users.</div>';
+      console.error('Error fetching software:', error);
+      softwareList.innerHTML = '<div class="error-message">Failed to load software.</div>';
     }
   };
 
@@ -269,50 +245,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // Fetch posts for comment filter
-  const fetchPostsForCommentFilter = async () => {
-    try {
-      const response = await fetch('/admin/api/posts', {
-        headers: {
-          'x-auth-token': adminToken
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch posts');
-      }
-      
-      const posts = await response.json();
-      
-      let options = '<option value="">All Posts</option>';
-      posts.forEach(post => {
-        options += `<option value="${post._id}">${post.title}</option>`;
-      });
-      
-      commentPostFilter.innerHTML = options;
-    } catch (error) {
-      console.error('Error fetching posts for filter:', error);
-    }
-  };
-
   // Fetch comments list
   const fetchComments = async () => {
     try {
-      const status = commentStatusFilter.value;
-      const postId = commentPostFilter.value;
-      const searchQuery = commentSearch.value.trim();
+      commentsList.innerHTML = '<div class="loading">Loading...</div>';
+      
+      const softwareId = commentSoftwareFilter ? commentSoftwareFilter.value : '';
+      const searchQuery = commentSearch ? commentSearch.value.trim() : '';
       
       let url = '/admin/api/comments';
-      const params = new URLSearchParams();
-      
-      if (status !== 'all') params.append('status', status);
-      if (postId) params.append('postId', postId);
-      if (searchQuery) params.append('search', searchQuery);
-      
-      const queryString = params.toString();
-      if (queryString) url += `?${queryString}`;
-      
-      commentsList.innerHTML = '<div class="loading">Loading...</div>';
+      if (softwareId || searchQuery) {
+        url += '?';
+        if (softwareId) url += `softwareId=${softwareId}`;
+        if (softwareId && searchQuery) url += '&';
+        if (searchQuery) url += `search=${encodeURIComponent(searchQuery)}`;
+      }
       
       const response = await fetch(url, {
         headers: {
@@ -327,24 +274,24 @@ document.addEventListener('DOMContentLoaded', () => {
       const comments = await response.json();
       
       if (comments.length === 0) {
-        commentsList.innerHTML = '<div class="empty-state">No comments found.</div>';
+        commentsList.innerHTML = '<div class="empty-state">No comments available yet.</div>';
         return;
       }
       
-      // Group comments by post
-      const commentsByPost = {};
+      // Group comments by software
+      const commentsBySoftware = {};
       comments.forEach(comment => {
-        const postId = comment.postId ? comment.postId._id : 'unknown';
-        const postTitle = comment.postId ? comment.postId.title : 'Unknown Post';
+        const softwareId = comment.softwareId ? comment.softwareId._id : 'unknown';
+        const softwareTitle = comment.softwareId ? comment.softwareId.title : 'Unknown Software';
         
-        if (!commentsByPost[postId]) {
-          commentsByPost[postId] = {
-            title: postTitle,
+        if (!commentsBySoftware[softwareId]) {
+          commentsBySoftware[softwareId] = {
+            title: softwareTitle,
             comments: []
           };
         }
         
-        commentsByPost[postId].comments.push(comment);
+        commentsBySoftware[softwareId].comments.push(comment);
       });
       
       let commentsHTML = '';
@@ -360,21 +307,20 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       `;
       
-      // Render comments by post
-      Object.keys(commentsByPost).forEach(postId => {
-        const postData = commentsByPost[postId];
+      // Render comments by software
+      Object.keys(commentsBySoftware).forEach(softwareId => {
+        const softwareData = commentsBySoftware[softwareId];
         
         commentsHTML += `
-          <div class="comment-post-section">
-            <h3 class="comment-post-title">${postData.title}</h3>
+          <div class="comment-software-section">
+            <h3 class="comment-software-title">${softwareData.title}</h3>
             <div class="comment-list">
         `;
         
-        postData.comments.forEach(comment => {
+        softwareData.comments.forEach(comment => {
           const date = new Date(comment.createdAt).toLocaleDateString();
           const isReply = comment.parentId ? true : false;
           const status = comment.status || 'approved';
-          const statusClass = `status-${status}`;
           
           commentsHTML += `
             <div class="admin-item comment-item ${isReply ? 'comment-reply' : ''} ${status !== 'approved' ? 'comment-held' : ''}">
@@ -385,7 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="admin-item-title">
                   <span class="comment-username">${comment.username}</span>
                   ${isReply ? '<span class="reply-badge">Reply</span>' : ''}
-                  <span class="status-badge ${statusClass}">${status}</span>
+                  <span class="comment-status-badge status-${status}">${status}</span>
                 </div>
                 <div class="admin-item-meta">
                   Posted: ${date}
@@ -397,7 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   `<button class="btn-small" onclick="holdComment('${comment._id}')">Hold</button>` : 
                   `<button class="btn-small" onclick="approveComment('${comment._id}')">Approve</button>`
                 }
-                <button class="btn-small" onclick="blockUser('${comment.userId}')">Block User</button>
+                <button class="btn-small" onclick="blockUser('${comment.username}')">Block User</button>
                 <button class="delete-btn" onclick="deleteComment('${comment._id}')">Delete</button>
               </div>
             </div>
@@ -426,78 +372,6 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (error) {
       console.error('Error fetching comments:', error);
       commentsList.innerHTML = '<div class="error-message">Failed to load comments.</div>';
-    }
-  };
-
-  // Fetch reports list
-  const fetchReports = async () => {
-    try {
-      const status = reportStatusFilter.value;
-      const type = reportTypeFilter.value;
-      
-      let url = '/admin/api/reports';
-      const params = new URLSearchParams();
-      
-      if (status !== 'all') params.append('status', status);
-      if (type !== 'all') params.append('type', type);
-      
-      const queryString = params.toString();
-      if (queryString) url += `?${queryString}`;
-      
-      reportsList.innerHTML = '<div class="loading">Loading...</div>';
-      
-      const response = await fetch(url, {
-        headers: {
-          'x-auth-token': adminToken
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch reports');
-      }
-      
-      const reports = await response.json();
-      
-      if (reports.length === 0) {
-        reportsList.innerHTML = '<div class="empty-state">No reports found.</div>';
-        return;
-      }
-      
-      let reportsHTML = '';
-      reports.forEach(report => {
-        const date = new Date(report.createdAt).toLocaleDateString();
-        const statusClass = `status-${report.status}`;
-        
-        reportsHTML += `
-          <div class="admin-item">
-            <div class="admin-item-info">
-              <h3 class="admin-item-title">
-                ${report.type.charAt(0).toUpperCase() + report.type.slice(1)} Report: 
-                ${report.targetTitle}
-              </h3>
-              <div class="admin-item-meta">
-                Reported by: ${report.reporter.username} | Date: ${date} |
-                <span class="status-badge ${statusClass}">${report.status}</span>
-              </div>
-              <div class="report-reason">
-                <strong>Reason:</strong> ${report.reason}
-              </div>
-            </div>
-            <div class="admin-item-actions">
-              <button class="btn-small" onclick="viewReportedItem('${report.targetId}', '${report.type}')">View Item</button>
-              ${report.status === 'pending' ? `
-                <button class="btn-small" onclick="resolveReport('${report._id}')">Resolve</button>
-                <button class="btn-small" onclick="dismissReport('${report._id}')">Dismiss</button>
-              ` : ''}
-            </div>
-          </div>
-        `;
-      });
-      
-      reportsList.innerHTML = reportsHTML;
-    } catch (error) {
-      console.error('Error fetching reports:', error);
-      reportsList.innerHTML = '<div class="error-message">Failed to load reports.</div>';
     }
   };
 
@@ -629,6 +503,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  // Show add software form
+  if (addSoftwareBtn) {
+    addSoftwareBtn.addEventListener('click', () => {
+      document.getElementById('form-title').textContent = 'Add New Software';
+      document.getElementById('software-id').value = '';
+      softwareForm.reset();
+      
+      // Clear download groups and add an empty one
+      if (downloadGroupsContainer) {
+        downloadGroupsContainer.innerHTML = '';
+        addDownloadGroup();
+      }
+      
+      softwareFormContainer.classList.remove('hidden');
+    });
+  }
+
+  // Hide software form
+  if (cancelSoftwareBtn) {
+    cancelSoftwareBtn.addEventListener('click', () => {
+      softwareFormContainer.classList.add('hidden');
+    });
+  }
+
   // Show add notice form
   if (addNoticeBtn) {
     addNoticeBtn.addEventListener('click', () => {
@@ -644,6 +542,521 @@ document.addEventListener('DOMContentLoaded', () => {
   if (cancelNoticeBtn) {
     cancelNoticeBtn.addEventListener('click', () => {
       noticeFormContainer.classList.add('hidden');
+    });
+  }
+
+  // Add download group
+  if (addGroupBtn) {
+    addGroupBtn.addEventListener('click', () => {
+      addDownloadGroup();
+    });
+  }
+
+  // Handle comment search
+  if (commentSearch) {
+    commentSearch.addEventListener('input', debounce(() => {
+      fetchComments();
+    }, 500));
+  }
+
+  // Handle comment software filter
+  if (commentSoftwareFilter) {
+    commentSoftwareFilter.addEventListener('change', () => {
+      fetchComments();
+    });
+  }
+
+  // Handle admin search
+  if (adminSearchButton) {
+    adminSearchButton.addEventListener('click', () => {
+      const query = adminSearchInput.value.trim();
+      if (query) {
+        // Determine which section is active
+        const activeSection = document.querySelector('.nav-btn.active').dataset.section;
+        
+        if (activeSection === 'software') {
+          // Search software
+          searchSoftware(query);
+        } else if (activeSection === 'notices') {
+          // Search notices
+          searchNotices(query);
+        } else if (activeSection === 'comments') {
+          // Set comment search
+          commentSearch.value = query;
+          fetchComments();
+        }
+      }
+    });
+  }
+
+  // Search software
+  const searchSoftware = async (query) => {
+    try {
+      softwareList.innerHTML = '<div class="loading">Searching...</div>';
+      
+      const response = await fetch(`/admin/api/software/search?q=${encodeURIComponent(query)}`, {
+        headers: {
+          'x-auth-token': adminToken
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to search software');
+      }
+      
+      const software = await response.json();
+      
+      if (software.length === 0) {
+        softwareList.innerHTML = '<div class="empty-state">No software found matching your search.</div>';
+        return;
+      }
+      
+      let softwareHTML = '';
+      software.forEach(item => {
+        const date = new Date(item.createdAt).toLocaleDateString();
+        softwareHTML += `
+          <div class="admin-item">
+            <div class="admin-item-info">
+              <h3 class="admin-item-title">${item.title}</h3>
+              <div class="admin-item-meta">
+                Added: ${date} | Views: ${item.views} | Downloads: ${item.downloads}
+              </div>
+            </div>
+            <div class="admin-item-actions">
+              <button class="edit-btn" onclick="editSoftware('${item._id}')">Edit</button>
+              <button class="delete-btn" onclick="deleteSoftware('${item._id}')">Delete</button>
+            </div>
+          </div>
+        `;
+      });
+      
+      softwareList.innerHTML = softwareHTML;
+    } catch (error) {
+      console.error('Error searching software:', error);
+      softwareList.innerHTML = '<div class="error-message">Failed to search software.</div>';
+    }
+  };
+
+  // Search notices
+  const searchNotices = async (query) => {
+    try {
+      noticeList.innerHTML = '<div class="loading">Searching...</div>';
+      
+      const response = await fetch(`/admin/api/notices/search?q=${encodeURIComponent(query)}`, {
+        headers: {
+          'x-auth-token': adminToken
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to search notices');
+      }
+      
+      const notices = await response.json();
+      
+      if (notices.length === 0) {
+        noticeList.innerHTML = '<div class="empty-state">No notices found matching your search.</div>';
+        return;
+      }
+      
+      let noticesHTML = '';
+      notices.forEach(notice => {
+        const date = new Date(notice.createdAt).toLocaleDateString();
+        noticesHTML += `
+          <div class="admin-item">
+            <div class="admin-item-info">
+              <div class="admin-item-title">${notice.content}</div>
+              <div class="admin-item-meta">Added: ${date}</div>
+            </div>
+            <div class="admin-item-actions">
+              <button class="toggle-btn ${notice.active ? 'active' : 'inactive'}" 
+                onclick="toggleNotice('${notice._id}', ${!notice.active})">
+                ${notice.active ? 'Active' : 'Inactive'}
+              </button>
+              <button class="edit-btn" onclick="editNotice('${notice._id}')">Edit</button>
+              <button class="delete-btn" onclick="deleteNotice('${notice._id}')">Delete</button>
+            </div>
+          </div>
+        `;
+      });
+      
+      noticeList.innerHTML = noticesHTML;
+    } catch (error) {
+      console.error('Error searching notices:', error);
+      noticeList.innerHTML = '<div class="error-message">Failed to search notices.</div>';
+    }
+  };
+
+  // Add download group function
+  function addDownloadGroup(name = '', links = []) {
+    if (!downloadGroupsContainer) return;
+    
+    const groupId = Date.now(); // Unique ID for this group
+    const groupContainer = document.createElement('div');
+    groupContainer.className = 'download-group-container';
+    groupContainer.innerHTML = `
+      <div class="group-header">
+        <input type="text" class="group-name" placeholder="Group Name" value="${name}" required>
+        <button type="button" class="remove-group-btn">Remove Group</button>
+      </div>
+      <div class="download-links-container" id="group-${groupId}-links">
+        ${links.length > 0 ? links.map(link => `
+          <div class="download-link-row">
+            <input type="text" name="link-label[]" placeholder="Label" value="${link.label}" required>
+            <input type="url" name="link-url[]" placeholder="URL" value="${link.url}" required>
+            <button type="button" class="remove-link-btn">Remove</button>
+          </div>
+        `).join('') : `
+          <div class="download-link-row">
+            <input type="text" name="link-label[]" placeholder="Label" required>
+            <input type="url" name="link-url[]" placeholder="URL" required>
+            <button type="button" class="remove-link-btn">Remove</button>
+          </div>
+        `}
+      </div>
+      <div class="bulk-url-container">
+        <label for="bulk-url-${groupId}">Bulk URL Entry:</label>
+        <textarea id="bulk-url-${groupId}" class="bulk-url-input" placeholder="Paste multiple URLs (one per line) to auto-fill"></textarea>
+        <button type="button" class="process-bulk-btn" data-group-id="${groupId}">Process URLs</button>
+      </div>
+      <button type="button" class="add-link-btn" data-group-id="${groupId}">Add Link</button>
+    `;
+    
+    // Add event listeners
+    groupContainer.querySelector('.remove-group-btn').addEventListener('click', function() {
+      if (document.querySelectorAll('.download-group-container').length > 1 || 
+          confirm('Are you sure you want to remove the only download group?')) {
+        groupContainer.remove();
+      }
+    });
+    
+    groupContainer.querySelector('.add-link-btn').addEventListener('click', function() {
+      const groupId = this.getAttribute('data-group-id');
+      addDownloadLinkToGroup(groupId);
+    });
+    
+    // Add event listener for bulk URL processing
+    groupContainer.querySelector('.process-bulk-btn').addEventListener('click', function() {
+      const groupId = this.getAttribute('data-group-id');
+      processBulkUrls(groupId);
+    });
+    
+    // Add event listeners to remove buttons for existing links
+    groupContainer.querySelectorAll('.remove-link-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const linksContainer = document.getElementById(`group-${groupId}-links`);
+        if (linksContainer.children.length > 1) {
+          btn.closest('.download-link-row').remove();
+        } else {
+          alert('Each group must have at least one download link');
+        }
+      });
+    });
+    
+    // Add event listeners for URL fields to detect pasted multiple URLs
+    const urlFields = groupContainer.querySelectorAll('input[name="link-url[]"]');
+    urlFields.forEach(field => {
+      field.addEventListener('paste', handleUrlPaste);
+    });
+    
+    downloadGroupsContainer.appendChild(groupContainer);
+  }
+
+  // Process bulk URLs
+  function processBulkUrls(groupId) {
+    const bulkUrlInput = document.getElementById(`bulk-url-${groupId}`);
+    const linksContainer = document.getElementById(`group-${groupId}-links`);
+    
+    if (!bulkUrlInput || !linksContainer) return;
+    
+    const urls = bulkUrlInput.value.trim().split('\n').filter(url => url.trim() !== '');
+    
+    if (urls.length === 0) {
+      alert('Please enter at least one URL');
+      return;
+    }
+    
+    // Clear existing links except the first one
+    while (linksContainer.children.length > 1) {
+      linksContainer.removeChild(linksContainer.lastChild);
+    }
+    
+    // Set the first URL and label
+    const firstRow = linksContainer.children[0];
+    const labelInput = firstRow.querySelector('input[name="link-label[]"]');
+    const urlInput = firstRow.querySelector('input[name="link-url[]"]');
+    
+    labelInput.value = 'PART1';
+    urlInput.value = urls[0];
+    
+    // Add the rest of the URLs
+    for (let i = 1; i < urls.length; i++) {
+      const row = document.createElement('div');
+      row.className = 'download-link-row';
+      row.innerHTML = `
+        <input type="text" name="link-label[]" placeholder="Label" value="PART${i+1}" required>
+        <input type="url" name="link-url[]" placeholder="URL" value="${urls[i]}" required>
+        <button type="button" class="remove-link-btn">Remove</button>
+      `;
+      
+      // Add event listener to remove button
+      row.querySelector('.remove-link-btn').addEventListener('click', function() {
+        if (linksContainer.children.length > 1) {
+          row.remove();
+        } else {
+          alert('Each group must have at least one download link');
+        }
+      });
+      
+      // Add event listener for URL field to detect pasted multiple URLs
+      row.querySelector('input[name="link-url[]"]').addEventListener('paste', handleUrlPaste);
+      
+      linksContainer.appendChild(row);
+    }
+    
+    // Clear the bulk input
+    bulkUrlInput.value = '';
+  }
+
+  function handleUrlPaste(e) {
+    // Get the pasted text
+    const clipboardData = e.clipboardData || window.clipboardData;
+    const pastedText = clipboardData.getData('text');
+    
+    // Check if it contains multiple lines (potential multiple URLs)
+    if (pastedText.includes('\n')) {
+      e.preventDefault(); // Prevent default paste behavior
+      
+      // Get the URLs from the pasted text
+      const urls = pastedText.trim().split('\n').filter(url => url.trim() !== '');
+      
+      if (urls.length <= 1) {
+        // If only one URL, just paste it normally
+        e.target.value = urls[0];
+        return;
+      }
+      
+      // Find the current group
+      const currentRow = e.target.closest('.download-link-row');
+      const groupContainer = currentRow.closest('.download-group-container');
+      const groupId = groupContainer.querySelector('.add-link-btn').getAttribute('data-group-id');
+      const linksContainer = document.getElementById(`group-${groupId}-links`);
+      
+      // Set the current field
+      const labelInput = currentRow.querySelector('input[name="link-label[]"]');
+      labelInput.value = 'PART1';
+      e.target.value = urls[0];
+      
+      // Remove existing links except the current one
+      Array.from(linksContainer.children).forEach(child => {
+        if (child !== currentRow) {
+          child.remove();
+        }
+      });
+      
+      // Add the rest of the URLs
+      for (let i = 1; i < urls.length; i++) {
+        const row = document.createElement('div');
+        row.className = 'download-link-row';
+        row.innerHTML = `
+          <input type="text" name="link-label[]" placeholder="Label" value="PART${i+1}" required>
+          <input type="url" name="link-url[]" placeholder="URL" value="${urls[i]}" required>
+          <button type="button" class="remove-link-btn">Remove</button>
+        `;
+        
+        // Add event listener to remove button
+        row.querySelector('.remove-link-btn').addEventListener('click', function() {
+          if (linksContainer.children.length > 1) {
+            row.remove();
+          } else {
+            alert('Each group must have at least one download link');
+          }
+        });
+        
+        // Add event listener for URL field to detect pasted multiple URLs
+        row.querySelector('input[name="link-url[]"]').addEventListener('paste', handleUrlPaste);
+        
+        linksContainer.appendChild(row);
+      }
+      
+      // Focus on the label of the first row to allow user to edit it
+      labelInput.focus();
+      labelInput.select();
+    }
+  }
+
+  // Add download link to a specific group
+  function addDownloadLinkToGroup(groupId) {
+    const linksContainer = document.getElementById(`group-${groupId}-links`);
+    if (!linksContainer) return;
+    
+    const row = document.createElement('div');
+    row.className = 'download-link-row';
+    row.innerHTML = `
+      <input type="text" name="link-label[]" placeholder="Label" required>
+      <input type="url" name="link-url[]" placeholder="URL" required>
+      <button type="button" class="remove-link-btn">Remove</button>
+    `;
+    
+    // Add event listener to remove button
+    row.querySelector('.remove-link-btn').addEventListener('click', function() {
+      if (linksContainer.children.length > 1) {
+        row.remove();
+      } else {
+        alert('Each group must have at least one download link');
+      }
+    });
+    
+    // Add event listener for URL field to detect pasted multiple URLs
+    row.querySelector('input[name="link-url[]"]').addEventListener('paste', handleUrlPaste);
+    
+    linksContainer.appendChild(row);
+  }
+  
+  // Handle software form submission
+  if (softwareForm) {
+    softwareForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const softwareId = document.getElementById('software-id').value;
+      const title = document.getElementById('title').value.trim();
+      const description = document.getElementById('description').value.trim();
+      const tagsInput = document.getElementById('tags').value.trim();
+      const imageUrl = document.getElementById('image-url').value.trim();
+      
+      // Validate required fields
+      if (!title) {
+        alert('Title is required');
+        return;
+      }
+      
+      if (!description) {
+        alert('Description is required');
+        return;
+      }
+      
+      if (!imageUrl) {
+        alert('Image URL is required');
+        return;
+      }
+      
+      // Get download groups
+      const downloadGroups = [];
+      const groupContainers = document.querySelectorAll('.download-group-container');
+      
+      if (groupContainers.length === 0) {
+        alert('At least one download group with links is required');
+        return;
+      }
+      
+      groupContainers.forEach(container => {
+        const groupNameInput = container.querySelector('.group-name');
+        if (!groupNameInput) {
+          alert('Group name input not found');
+          return;
+        }
+        
+        const groupName = groupNameInput.value.trim();
+        if (!groupName) {
+          alert('Each download group must have a name');
+          return;
+        }
+        
+        const linkRows = container.querySelectorAll('.download-link-row');
+        if (linkRows.length === 0) {
+          alert(`Download group "${groupName}" must have at least one link`);
+          return;
+        }
+        
+        const links = [];
+        linkRows.forEach(row => {
+          const labelInput = row.querySelector('input[name="link-label[]"]');
+          const urlInput = row.querySelector('input[name="link-url[]"]');
+          
+          if (!labelInput || !urlInput) {
+            alert('Link inputs not found');
+            return;
+          }
+          
+          const label = labelInput.value.trim();
+          const url = urlInput.value.trim();
+          
+          if (!label) {
+            alert(`Each link in group "${groupName}" must have a label`);
+            return;
+          }
+          
+          if (!url) {
+            alert(`Each link in group "${groupName}" must have a URL`);
+            return;
+          }
+          
+          links.push({ label, url });
+        });
+        
+        if (links.length > 0) {
+          downloadGroups.push({
+            name: groupName,
+            links
+          });
+        }
+      });
+      
+      // Validate download groups
+      if (downloadGroups.length === 0) {
+        alert('At least one download group with links is required');
+        return;
+      }
+      
+      // Parse tags
+      const tags = tagsInput ? tagsInput.split(',').map(tag => tag.trim()) : [];
+      
+      // Create software object
+      const softwareData = {
+        title,
+        description,
+        tags,
+        imageUrl,
+        downloadGroups
+      };
+      
+      try {
+        let response;
+        
+        if (softwareId) {
+          // Update existing software
+          response = await fetch(`/admin/api/software/${softwareId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-auth-token': adminToken
+            },
+            body: JSON.stringify(softwareData)
+          });
+        } else {
+          // Add new software
+          response = await fetch('/admin/api/software', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-auth-token': adminToken
+            },
+            body: JSON.stringify(softwareData)
+          });
+        }
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to save software');
+        }
+        
+        // Hide form and refresh list
+        softwareFormContainer.classList.add('hidden');
+        fetchSoftware();
+      } catch (error) {
+        console.error('Error saving software:', error);
+        alert(error.message || 'Failed to save software. Please try again.');
+      }
     });
   }
 
@@ -701,100 +1114,57 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Filter event listeners
-  if (postStatusFilter) postStatusFilter.addEventListener('change', fetchPosts);
-  if (postCategoryFilter) postCategoryFilter.addEventListener('change', fetchPosts);
-  if (postSearch) postSearch.addEventListener('input', debounce(fetchPosts, 500));
-  if (userStatusFilter) userStatusFilter.addEventListener('change', fetchUsers);
-  if (userSearch) userSearch.addEventListener('input', debounce(fetchUsers, 500));
-  if (commentStatusFilter) commentStatusFilter.addEventListener('change', fetchComments);
-  if (commentPostFilter) commentPostFilter.addEventListener('change', fetchComments);
-  if (commentSearch) commentSearch.addEventListener('input', debounce(fetchComments, 500));
-  if (reportStatusFilter) reportStatusFilter.addEventListener('change', fetchReports);
-  if (reportTypeFilter) reportTypeFilter.addEventListener('change', fetchReports);
-
-  // Utility function for debouncing
-  function debounce(func, wait) {
-    let timeout;
-    return function(...args) {
-      const context = this;
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func.apply(context, args), wait);
-    };
-  }
-
-  // Admin action functions
-  window.viewPost = async (id) => {
+  // Edit software
+  window.editSoftware = async (id) => {
     try {
-      const response = await fetch(`/admin/api/posts/${id}`, {
-        headers: {
-          'x-auth-token': adminToken
+      const response = await fetch(`/api/software/${id}`);
+      const software = await response.json();
+      
+      // Set form title
+      document.getElementById('form-title').textContent = 'Edit Software';
+      
+      // Fill form fields
+      document.getElementById('software-id').value = software._id;
+      document.getElementById('title').value = software.title;
+      document.getElementById('description').value = software.description;
+      document.getElementById('tags').value = software.tags.join(', ');
+      document.getElementById('image-url').value = software.imageUrl;
+      
+      // Clear existing download groups
+      if (downloadGroupsContainer) {
+        downloadGroupsContainer.innerHTML = '';
+        
+        // Add download groups
+        if (software.downloadGroups && software.downloadGroups.length > 0) {
+          // New format with groups
+          software.downloadGroups.forEach(group => {
+            addDownloadGroup(group.name, group.links);
+          });
+        } else if (software.downloadLinks && software.downloadLinks.length > 0) {
+          // Legacy format - convert to a single group
+          addDownloadGroup('Default', software.downloadLinks);
+        } else {
+          // No links - add empty group
+          addDownloadGroup();
         }
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch post details');
       }
       
-      const post = await response.json();
-      window.open(`/post/${post.slug}`, '_blank');
+      // Show form
+      softwareFormContainer.classList.remove('hidden');
     } catch (error) {
-      console.error('Error viewing post:', error);
-      alert('Failed to open post');
+      console.error('Error fetching software details:', error);
+      alert('Failed to load software details');
     }
   };
 
-  window.holdPost = async (id) => {
-    try {
-      const response = await fetch(`/admin/api/posts/${id}/status`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-auth-token': adminToken
-        },
-        body: JSON.stringify({ status: 'held' })
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to update post status');
-      }
-      
-      fetchPosts();
-    } catch (error) {
-      console.error('Error updating post status:', error);
-      alert('Failed to update post status');
-    }
-  };
-
-  window.approvePost = async (id) => {
-    try {
-      const response = await fetch(`/admin/api/posts/${id}/status`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-auth-token': adminToken
-        },
-        body: JSON.stringify({ status: 'active' })
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to update post status');
-      }
-      
-      fetchPosts();
-    } catch (error) {
-      console.error('Error updating post status:', error);
-      alert('Failed to update post status');
-    }
-  };
-
-  window.deletePost = async (id) => {
-    if (!confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
+  // Delete software
+  window.deleteSoftware = async (id) => {
+    if (!confirm('Are you sure you want to delete this software? This action cannot be undone.')) {
       return;
     }
     
     try {
-      const response = await fetch(`/admin/api/posts/${id}`, {
+      const response = await fetch(`/admin/api/software/${id}`, {
         method: 'DELETE',
         headers: {
           'x-auth-token': adminToken
@@ -802,82 +1172,17 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       
       if (!response.ok) {
-        throw new Error('Failed to delete post');
+        throw new Error('Failed to delete software');
       }
       
-      fetchPosts();
+      fetchSoftware();
     } catch (error) {
-      console.error('Error deleting post:', error);
-      alert('Failed to delete post');
+      console.error('Error deleting software:', error);
+      alert('Failed to delete software');
     }
   };
 
-
-  // And replace it with:
-  window.viewUserProfile = async (id) => {
-    try {
-      // Fetch the user's username first
-      const response = await fetch(`/admin/api/users/${id}`, {
-        headers: {
-          'x-auth-token': adminToken
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch user details');
-      }
-      
-      const user = await response.json();
-      window.open(`/user/${user.username}`, '_blank');
-    } catch (error) {
-      console.error('Error viewing user profile:', error);
-      alert('Failed to open user profile');
-    }
-  };
-  window.blockUser = async (id) => {
-    if (!confirm('Are you sure you want to block this user?')) {
-      return;
-    }
-    
-    try {
-      const response = await fetch(`/admin/api/users/${id}/block`, {
-        method: 'PUT',
-        headers: {
-          'x-auth-token': adminToken
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to block user');
-      }
-      
-      fetchUsers();
-    } catch (error) {
-      console.error('Error blocking user:', error);
-      alert('Failed to block user');
-    }
-  };
-
-  window.unblockUser = async (id) => {
-    try {
-      const response = await fetch(`/admin/api/users/${id}/unblock`, {
-        method: 'PUT',
-        headers: {
-          'x-auth-token': adminToken
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to unblock user');
-      }
-      
-      fetchUsers();
-    } catch (error) {
-      console.error('Error unblocking user:', error);
-      alert('Failed to unblock user');
-    }
-  };
-
+  // Edit notice
   window.editNotice = async (id) => {
     try {
       const response = await fetch(`/admin/api/notices`, {
@@ -909,6 +1214,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  // Toggle notice active status
   window.toggleNotice = async (id, active) => {
     try {
       const response = await fetch(`/admin/api/notices/${id}`, {
@@ -931,6 +1237,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  // Delete notice
   window.deleteNotice = async (id) => {
     if (!confirm('Are you sure you want to delete this notice?')) {
       return;
@@ -955,6 +1262,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  // Delete comment
   window.deleteComment = async (id) => {
     if (!confirm('Are you sure you want to delete this comment?')) {
       return;
@@ -979,7 +1287,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-
+  // Hold comment
   window.holdComment = async (id) => {
     try {
       const response = await fetch(`/admin/api/comments/${id}/status`, {
@@ -1002,6 +1310,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  // Approve comment
   window.approveComment = async (id) => {
     try {
       const response = await fetch(`/admin/api/comments/${id}/status`, {
@@ -1024,73 +1333,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  window.viewReportedItem = (id, type) => {
-    if (type === 'post') {
-      window.open(`/post/${id}`, '_blank');
-    } else if (type === 'comment') {
-      // Find the post ID for this comment and navigate to it
-      fetch(`/admin/api/comments/${id}`, {
-        headers: {
-          'x-auth-token': adminToken
-        }
-      })
-      .then(response => response.json())
-      .then(comment => {
-        window.open(`/post/${comment.postId}#comment-${id}`, '_blank');
-      })
-      .catch(error => {
-        console.error('Error fetching comment details:', error);
-        alert('Failed to load comment details');
-      });
-    } else if (type === 'user') {
-      window.open(`/user/${id}`, '_blank');
+  // Block user
+  window.blockUser = async (username) => {
+    if (!confirm(`Are you sure you want to block user "${username}"? This will prevent them from posting new comments.`)) {
+      return;
     }
-  };
-
-  window.resolveReport = async (id) => {
+    
     try {
-      const response = await fetch(`/admin/api/reports/${id}/status`, {
-        method: 'PUT',
+      const response = await fetch('/admin/api/blocked-users', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'x-auth-token': adminToken
         },
-        body: JSON.stringify({ status: 'resolved' })
+        body: JSON.stringify({ username })
       });
       
       if (!response.ok) {
-        throw new Error('Failed to resolve report');
+        throw new Error('Failed to block user');
       }
       
-      fetchReports();
+      alert(`User "${username}" has been blocked from commenting.`);
     } catch (error) {
-      console.error('Error resolving report:', error);
-      alert('Failed to resolve report');
+      console.error('Error blocking user:', error);
+      alert('Failed to block user');
     }
   };
 
-  window.dismissReport = async (id) => {
-    try {
-      const response = await fetch(`/admin/api/reports/${id}/status`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-auth-token': adminToken
-        },
-        body: JSON.stringify({ status: 'dismissed' })
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to dismiss report');
-      }
-      
-      fetchReports();
-    } catch (error) {
-      console.error('Error dismissing report:', error);
-      alert('Failed to dismiss report');
-    }
-  };
+  // Utility function for debouncing
+  function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+      const context = this;
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(context, args), wait);
+    };
+  }
 
-  // Initialize page - start with posts section
-  fetchPosts();
+  // Initialize page
+  checkAuth();
 });

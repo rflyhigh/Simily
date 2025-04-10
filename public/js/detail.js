@@ -1,263 +1,141 @@
-// FILE: /public/js/detail.js
 document.addEventListener('DOMContentLoaded', () => {
   // DOM elements
-  const postDetailSection = document.getElementById('post-detail');
-  const commentFormContainer = document.getElementById('comment-form-container');
+  const softwareDetailSection = document.getElementById('software-detail');
+  const commentForm = document.getElementById('comment-form');
   const commentsList = document.getElementById('comments-list');
   const searchInput = document.getElementById('search-input');
   const searchButton = document.getElementById('search-button');
-  const navLinks = document.getElementById('nav-links');
 
-  // Get post ID from URL
-  const postId = window.location.pathname.split('/').pop();
-  
-  // User data
-  let userData = null;
+  // Get software ID from URL
+  const softwareId = window.location.pathname.split('/').pop();
   
   // Track if we're replying to a comment
   let replyingToId = null;
 
-  // Check if user is logged in
-  const checkAuth = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      
-      if (!token) {
-        updateNavLinks(false);
-        return false;
-      }
-      
-      const response = await fetch('/api/auth/user', {
-        headers: {
-          'x-auth-token': token
-        }
-      });
-      
-      if (!response.ok) {
-        localStorage.removeItem('token');
-        updateNavLinks(false);
-        return false;
-      }
-      
-      userData = await response.json();
-      updateNavLinks(true, userData);
-      return true;
-    } catch (error) {
-      console.error('Auth check error:', error);
-      updateNavLinks(false);
-      return false;
-    }
-  };
-
-  // Update navigation links based on auth status
-  const updateNavLinks = (isLoggedIn, user = null) => {
-    if (isLoggedIn && user) {
-      navLinks.innerHTML = `
-        <a href="/upload" class="nav-link">Upload</a>
-        <a href="/user/${user.username}" class="nav-link">Profile</a>
-        <button id="logout-btn" class="nav-link">Logout</button>
-      `;
-      
-      // Add logout event listener
-      document.getElementById('logout-btn').addEventListener('click', () => {
-        localStorage.removeItem('token');
-        window.location.reload();
-      });
-    } else {
-      navLinks.innerHTML = `
-        <a href="/login" class="nav-link">Login</a>
-        <a href="/register" class="nav-link">Register</a>
-      `;
-    }
-  };
-
-  // Fetch and display post details
-  const fetchPostDetails = async () => {
-    try {
-      postDetailSection.innerHTML = '<div class="loading">Loading...</div>';
-      
-      const response = await fetch(`/api/posts/${postId}`);
-      
-      if (!response.ok) {
-        if (response.status === 404) {
-          window.location.href = '/404';
-          return;
-        }
-        throw new Error('Failed to fetch post details');
-      }
-      
-      const post = await response.json();
-      
-      // Update page title
-      document.title = `${post.title} - Simily`;
-      
-      // Format tags
-      const tagsHTML = post.tags.map(tag => 
-        `<span class="detail-tag">${tag}</span>`
-      ).join('');
-      
-      // Format download groups and links
-      let downloadGroupsHTML = '';
-      
-      if (post.downloadGroups && post.downloadGroups.length > 0) {
-        // Format with download groups
-        downloadGroupsHTML = `
-        <div class="download-groups">
-          ${post.downloadGroups.map((group, index) => {
-            // Create a string of all URLs for copy functionality
-            const allUrls = group.links.map(link => link.url).join('\n');
-            
-            return `
-            <div class="download-group" data-group-id="${index}">
-              <div class="group-header" onclick="toggleGroup(${index})">
-                <h4 class="download-group-name">${group.name}</h4>
-                <button class="group-toggle" aria-label="Toggle group">▼</button>
+  // Fetch and display software details
+  const fetchSoftwareDetails = async () => {
+      try {
+          softwareDetailSection.innerHTML = '<div class="loading">Loading...</div>';
+          
+          const response = await fetch(`/api/software/${softwareId}`);
+          
+          if (!response.ok) {
+              if (response.status === 404) {
+                  window.location.href = '/404';
+                  return;
+              }
+              throw new Error('Failed to fetch software details');
+          }
+          
+          const software = await response.json();
+          
+          // Update page title
+          document.title = `${software.title} - Simily`;
+          
+          // Format tags
+          const tagsHTML = software.tags.map(tag => 
+              `<span class="detail-tag">${tag}</span>`
+          ).join('');
+          
+          // Format download groups and links
+          let downloadGroupsHTML = '';
+          
+          if (software.downloadGroups && software.downloadGroups.length > 0) {
+              // New format with download groups
+              downloadGroupsHTML = `
+              <div class="download-groups">
+                  ${software.downloadGroups.map((group, index) => {
+                      // Create a string of all URLs for copy functionality
+                      const allUrls = group.links.map(link => link.url).join('\n');
+                      
+                      return `
+                      <div class="download-group" data-group-id="${index}">
+                          <div class="group-header" onclick="toggleGroup(${index})">
+                              <h4 class="download-group-name">${group.name}</h4>
+                              <button class="group-toggle" aria-label="Toggle group">▼</button>
+                          </div>
+                          <div class="download-links-container" id="group-${index}-links">
+                              <button class="copy-all-btn" onclick="copyAllLinks('${encodeURIComponent(allUrls)}', this)">
+                                  Copy all links to clipboard
+                              </button>
+                              <div class="download-links">
+                                  ${group.links.map(link => `
+                                      <a href="${link.url}" class="download-link" target="_blank" rel="noopener noreferrer" 
+                                      onclick="recordDownload('${software._id}')">${link.label}</a>
+                                  `).join('')}
+                              </div>
+                          </div>
+                      </div>
+                      `;
+                  }).join('')}
               </div>
-              <div class="download-links-container" id="group-${index}-links">
-                <button class="copy-all-btn" onclick="copyAllLinks('${encodeURIComponent(allUrls)}', this)">
-                  Copy all links to clipboard
-                </button>
-                <div class="download-links">
-                  ${group.links.map(link => `
-                    <a href="${link.url}" class="download-link" target="_blank" rel="noopener noreferrer" 
-                    onclick="recordView('${post._id}')">${link.label}</a>
-                  `).join('')}
-                </div>
+              `;
+          } else if (software.downloadLinks && software.downloadLinks.length > 0) {
+              // Legacy format with flat download links
+              const allUrls = software.downloadLinks.map(link => link.url).join('\n');
+              
+              downloadGroupsHTML = `
+              <div class="download-groups">
+                  <div class="download-group" data-group-id="legacy">
+                      <div class="group-header" onclick="toggleGroup('legacy')">
+                          <h4 class="download-group-name">Download Links</h4>
+                          <button class="group-toggle" aria-label="Toggle group">▼</button>
+                      </div>
+                      <div class="download-links-container" id="group-legacy-links">
+                          <button class="copy-all-btn" onclick="copyAllLinks('${encodeURIComponent(allUrls)}', this)">
+                              Copy all links to clipboard
+                          </button>
+                          <div class="download-links">
+                              ${software.downloadLinks.map(link => `
+                                  <a href="${link.url}" class="download-link" target="_blank" rel="noopener noreferrer" 
+                                  onclick="recordDownload('${software._id}')">${link.label}</a>
+                              `).join('')}
+                          </div>
+                      </div>
+                  </div>
               </div>
-            </div>
-            `;
-          }).join('')}
-        </div>
-        `;
+              `;
+          }
+          
+          // Format date
+          const createdDate = new Date(software.createdAt).toLocaleDateString();
+          
+          // Render software details with new layout
+          softwareDetailSection.innerHTML = `
+              <div class="detail-image-container">
+                  <img src="${software.imageUrl}" alt="${software.title}" class="detail-image">
+              </div>
+              <div class="detail-content">
+                  <div class="detail-header">
+                      <h1 class="detail-title">${software.title}</h1>
+                      <div class="detail-tags">
+                          ${tagsHTML}
+                      </div>
+                  </div>
+                  <div class="detail-description">
+                      ${software.description}
+                  </div>
+                  <div class="download-section">
+                      <h3>Download Links</h3>
+                      ${downloadGroupsHTML}
+                      <div class="stats">
+                          <span>${software.views} views</span>
+                          <span>${software.downloads} downloads</span>
+                          <span>Added on ${createdDate}</span>
+                      </div>
+                  </div>
+              </div>
+          `;
+      } catch (error) {
+          console.error('Error fetching software details:', error);
+          softwareDetailSection.innerHTML = '<div class="error-message">Failed to load software details.</div>';
       }
-      
-      // Format date
-      const createdDate = new Date(post.createdAt).toLocaleDateString();
-      
-      // Check if current user is the author
-      const isAuthor = userData && post.author._id === userData._id;
-      
-      // Create voting HTML
-      const votingHTML = `
-        <div class="voting-section">
-          <button class="vote-btn upvote ${post.userVote === 'up' ? 'voted' : ''}" data-vote="up" onclick="votePost('${post._id}', 'up')">
-            <span class="vote-icon">▲</span>
-            <span class="vote-count">${post.upvotes}</span>
-          </button>
-          <button class="vote-btn downvote ${post.userVote === 'down' ? 'voted' : ''}" data-vote="down" onclick="votePost('${post._id}', 'down')">
-            <span class="vote-icon">▼</span>
-            <span class="vote-count">${post.downvotes}</span>
-          </button>
-        </div>
-      `;
-      
-      // Create author actions HTML
-      const authorActionsHTML = isAuthor ? `
-        <div class="author-actions">
-          <a href="/upload?edit=${post._id}" class="edit-btn">Edit</a>
-          <button class="delete-btn" onclick="deletePost('${post._id}')">Delete</button>
-        </div>
-      ` : '';
-      
-      // Create report button HTML
-      const reportButtonHTML = userData && !isAuthor ? `
-        <button class="report-btn" onclick="reportPost('${post._id}')">Report</button>
-      ` : '';
-      
-      // Render post details with new layout
-      postDetailSection.innerHTML = `
-        <div class="detail-image-container">
-          <img src="${post.imageUrl}" alt="${post.title}" class="detail-image">
-        </div>
-        <div class="detail-content">
-          <div class="detail-header">
-            <h1 class="detail-title">${post.title}</h1>
-            <div class="post-meta">
-              <span class="post-author">Posted by: <a href="/user/${post.author.username}">${post.author.username}</a></span>
-              <span class="post-category">Category: ${post.category}</span>
-            </div>
-            <div class="detail-tags">
-              ${tagsHTML}
-            </div>
-          </div>
-          
-          <div class="detail-actions">
-            ${votingHTML}
-            ${authorActionsHTML}
-            ${reportButtonHTML}
-          </div>
-          
-          <div class="detail-description">
-            ${post.description}
-          </div>
-          
-          <div class="download-section">
-            <h3>Download Links</h3>
-            ${downloadGroupsHTML}
-            <div class="stats">
-              <span>${post.views} views</span>
-              <span>${post.upvotes - post.downvotes} points (${Math.round((post.upvotes / (post.upvotes + post.downvotes || 1)) * 100)}% upvoted)</span>
-              <span>Added on ${createdDate}</span>
-            </div>
-          </div>
-        </div>
-      `;
-    } catch (error) {
-      console.error('Error fetching post details:', error);
-      postDetailSection.innerHTML = '<div class="error-message">Failed to load post details.</div>';
-    }
   };
 
-  // Prepare comment form based on auth status
-  const prepareCommentForm = (isLoggedIn) => {
-    if (isLoggedIn) {
-      commentFormContainer.innerHTML = `
-        <div class="comment-form">
-          <h3>Add a Comment</h3>
-          <form id="comment-form">
-            <div class="form-group">
-              <label for="content">Comment</label>
-              <textarea id="content" name="content" rows="4" required></textarea>
-            </div>
-            <button type="submit" class="btn">Post Comment</button>
-          </form>
-        </div>
-      `;
-      
-      // Add event listener to comment form
-      document.getElementById('comment-form').addEventListener('submit', handleCommentSubmit);
-    } else {
-      commentFormContainer.innerHTML = `
-        <div class="login-to-comment">
-          <p>Please <a href="/login">login</a> or <a href="/register">register</a> to comment.</p>
-        </div>
-      `;
-    }
-  };
-
+  // Fetch and display comments
   const fetchComments = async () => {
     try {
-      // Get post ID from URL
-      const postId = window.location.pathname.split('/').pop();
-      
-      // First try to fetch comments using the slug/identifier from the URL
-      let response = await fetch(`/api/posts/${postId}/comments`);
-      
-      // If that fails, it might be because we need the actual post ID
-      if (!response.ok) {
-        // Try to get the post first to get its ID
-        const postResponse = await fetch(`/api/posts/${postId}`);
-        if (postResponse.ok) {
-          const post = await postResponse.json();
-          // Now fetch comments with the actual post ID
-          response = await fetch(`/api/posts/${post._id}/comments`);
-        }
-      }
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch comments');
-      }
-      
+      const response = await fetch(`/api/software/${softwareId}/comments`);
       const comments = await response.json();
       
       if (comments.length === 0) {
@@ -288,19 +166,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const renderCommentThread = (comment) => {
     const date = new Date(comment.createdAt).toLocaleDateString();
     
-    // Check if current user is the author
-    const isAuthor = userData && comment.userId === userData._id;
-    
-    // Create author actions HTML
-    const authorActionsHTML = isAuthor ? `
-      <button class="delete-comment-btn" onclick="deleteComment('${comment._id}')">Delete</button>
-    ` : '';
-    
-    // Create report button HTML
-    const reportButtonHTML = userData && !isAuthor ? `
-      <button class="report-btn" onclick="reportComment('${comment._id}')">Report</button>
-    ` : '';
-    
     let repliesHTML = '';
     if (comment.replies && comment.replies.length > 0) {
       repliesHTML = `
@@ -314,16 +179,14 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="comment-thread" id="comment-${comment._id}">
         <div class="comment">
           <div class="comment-header">
-            <span class="comment-username"><a href="/user/${comment.username}">${comment.username}</a></span>
+            <span class="comment-username">${comment.username}</span>
             <span class="comment-date">${date}</span>
           </div>
           <div class="comment-content">
             ${comment.content}
           </div>
           <div class="comment-actions">
-            ${userData ? `<button class="reply-btn" data-comment-id="${comment._id}">Reply</button>` : ''}
-            ${authorActionsHTML}
-            ${reportButtonHTML}
+            <button class="reply-btn" data-comment-id="${comment._id}">Reply</button>
           </div>
           <div class="reply-form-container" id="reply-form-${comment._id}"></div>
         </div>
@@ -336,33 +199,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const renderReply = (reply) => {
     const date = new Date(reply.createdAt).toLocaleDateString();
     
-    // Check if current user is the author
-    const isAuthor = userData && reply.userId === userData._id;
-    
-    // Create author actions HTML
-    const authorActionsHTML = isAuthor ? `
-      <button class="delete-comment-btn" onclick="deleteComment('${reply._id}')">Delete</button>
-    ` : '';
-    
-    // Create report button HTML
-    const reportButtonHTML = userData && !isAuthor ? `
-      <button class="report-btn" onclick="reportComment('${reply._id}')">Report</button>
-    ` : '';
-    
     return `
       <div class="reply" id="comment-${reply._id}">
         <div class="comment">
           <div class="comment-header">
-            <span class="comment-username"><a href="/user/${reply.username}">${reply.username}</a></span>
+            <span class="comment-username">${reply.username}</span>
             <span class="comment-date">${date}</span>
           </div>
           <div class="comment-content">
             ${reply.content}
           </div>
           <div class="comment-actions">
-            ${userData ? `<button class="reply-btn" data-comment-id="${reply.parentId}">Reply</button>` : ''}
-            ${authorActionsHTML}
-            ${reportButtonHTML}
+            <button class="reply-btn" data-comment-id="${reply.parentId}">Reply</button>
           </div>
         </div>
       </div>
@@ -391,6 +239,10 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="reply-form">
         <h4>Reply to comment</h4>
         <form id="reply-form-${commentId}">
+          <div class="form-group">
+            <label for="reply-username-${commentId}">Username</label>
+            <input type="text" id="reply-username-${commentId}" name="username" required>
+          </div>
           <div class="form-group">
             <label for="reply-content-${commentId}">Comment</label>
             <textarea id="reply-content-${commentId}" name="content" rows="3" required></textarea>
@@ -423,23 +275,22 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (!replyingToId) return;
     
+    const username = document.getElementById(`reply-username-${replyingToId}`).value.trim();
     const content = document.getElementById(`reply-content-${replyingToId}`).value.trim();
     
-    if (!content) {
-      alert('Please enter your comment');
+    if (!username || !content) {
+      alert('Please fill in all fields');
       return;
     }
     
     try {
-      const token = localStorage.getItem('token');
-      
-      const response = await fetch(`/api/posts/${postId}/comments`, {
+      const response = await fetch(`/api/software/${softwareId}/comments`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'x-auth-token': token
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ 
+          username, 
           content,
           parentId: replyingToId
         })
@@ -477,57 +328,58 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // Handle main comment form submission
-  const handleCommentSubmit = async (e) => {
-    e.preventDefault();
-    
-    const content = document.getElementById('content').value.trim();
-    
-    if (!content) {
-      alert('Please enter your comment');
-      return;
-    }
-    
-    try {
-      const token = localStorage.getItem('token');
+  if (commentForm) {
+    commentForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
       
-      const response = await fetch(`/api/posts/${postId}/comments`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-auth-token': token
-        },
-        body: JSON.stringify({ content })
-      });
+      const username = document.getElementById('username').value.trim();
+      const content = document.getElementById('content').value.trim();
       
-      if (response.status === 403) {
-        // User is blocked
-        const errorData = await response.json();
-        showCommentNotification('error', errorData.error || 'Your account has been blocked from commenting.');
+      if (!username || !content) {
+        alert('Please fill in all fields');
         return;
       }
       
-      if (!response.ok) {
-        throw new Error('Failed to post comment');
+      try {
+        const response = await fetch(`/api/software/${softwareId}/comments`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, content })
+        });
+        
+        if (response.status === 403) {
+          // User is blocked
+          const errorData = await response.json();
+          showCommentNotification('error', errorData.error || 'Your account has been blocked from commenting.');
+          return;
+        }
+        
+        if (!response.ok) {
+          throw new Error('Failed to post comment');
+        }
+        
+        const commentData = await response.json();
+        
+        // Clear form
+        document.getElementById('username').value = '';
+        document.getElementById('content').value = '';
+        
+        // Show success message based on comment status
+        if (commentData.status === 'approved') {
+          showCommentNotification('success', 'Your comment has been posted!');
+          // Refresh comments to show the new comment
+          fetchComments();
+        } else {
+          showCommentNotification('info', 'Your comment has been submitted and is awaiting approval.');
+        }
+      } catch (error) {
+        console.error('Error posting comment:', error);
+        alert('Failed to post comment. Please try again.');
       }
-      
-      const commentData = await response.json();
-      
-      // Clear form
-      document.getElementById('content').value = '';
-      
-      // Show success message based on comment status
-      if (commentData.status === 'approved') {
-        showCommentNotification('success', 'Your comment has been posted!');
-        // Refresh comments to show the new comment
-        fetchComments();
-      } else {
-        showCommentNotification('info', 'Your comment has been submitted and is awaiting approval.');
-      }
-    } catch (error) {
-      console.error('Error posting comment:', error);
-      alert('Failed to post comment. Please try again.');
-    }
-  };
+    });
+  }
 
   // Show notification for comment status
   const showCommentNotification = (type, message) => {
@@ -563,167 +415,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 5000);
   };
 
-  // Record view
-  window.recordView = async (id) => {
+  // Record download
+  window.recordDownload = async (id) => {
     try {
-      await fetch(`/api/posts/${id}/view`, {
+      await fetch(`/api/software/${id}/download`, {
         method: 'POST'
       });
     } catch (error) {
-      console.error('Error recording view:', error);
-    }
-  };
-
-  // Vote on post
-  window.votePost = async (id, voteType) => {
-    try {
-      if (!userData) {
-        alert('Please login to vote');
-        return;
-      }
-      
-      const token = localStorage.getItem('token');
-      
-      const response = await fetch(`/api/posts/${id}/vote`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-auth-token': token
-        },
-        body: JSON.stringify({ vote: voteType })
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to vote');
-      }
-      
-      // Refresh post details to update vote counts
-      fetchPostDetails();
-    } catch (error) {
-      console.error('Error voting:', error);
-      alert('Failed to vote. Please try again.');
-    }
-  };
-
-  // Delete post
-  window.deletePost = async (id) => {
-    if (!confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
-      return;
-    }
-    
-    try {
-      const token = localStorage.getItem('token');
-      
-      const response = await fetch(`/api/posts/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'x-auth-token': token
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to delete post');
-      }
-      
-      // Redirect to home page
-      window.location.href = '/';
-    } catch (error) {
-      console.error('Error deleting post:', error);
-      alert('Failed to delete post. Please try again.');
-    }
-  };
-
-  // Delete comment
-  window.deleteComment = async (id) => {
-    if (!confirm('Are you sure you want to delete this comment? This action cannot be undone.')) {
-      return;
-    }
-    
-    try {
-      const token = localStorage.getItem('token');
-      
-      const response = await fetch(`/api/comments/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'x-auth-token': token
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to delete comment');
-      }
-      
-      // Refresh comments
-      fetchComments();
-    } catch (error) {
-      console.error('Error deleting comment:', error);
-      alert('Failed to delete comment. Please try again.');
-    }
-  };
-
-  // Report post
-  window.reportPost = async (id) => {
-    const reason = prompt('Please provide a reason for reporting this post:');
-    
-    if (!reason) return;
-    
-    try {
-      const token = localStorage.getItem('token');
-      
-      const response = await fetch('/api/reports', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-auth-token': token
-        },
-        body: JSON.stringify({
-          targetId: id,
-          type: 'post',
-          reason
-        })
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to submit report');
-      }
-      
-      alert('Report submitted successfully. Thank you for helping keep Simily safe.');
-    } catch (error) {
-      console.error('Error reporting post:', error);
-      alert('Failed to submit report. Please try again.');
-    }
-  };
-
-  // Report comment
-  window.reportComment = async (id) => {
-    const reason = prompt('Please provide a reason for reporting this comment:');
-    
-    if (!reason) return;
-    
-    try {
-      const token = localStorage.getItem('token');
-      
-      const response = await fetch('/api/reports', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-auth-token': token
-        },
-        body: JSON.stringify({
-          targetId: id,
-          type: 'comment',
-          reason
-        })
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to submit report');
-      }
-      
-      alert('Report submitted successfully. Thank you for helping keep Simily safe.');
-    } catch (error) {
-      console.error('Error reporting comment:', error);
-      alert('Failed to submit report. Please try again.');
+      console.error('Error recording download:', error);
     }
   };
 
@@ -776,12 +475,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Initialize page
-  const init = async () => {
-    const isLoggedIn = await checkAuth();
-    prepareCommentForm(isLoggedIn);
-    fetchPostDetails();
-    fetchComments();
-  };
-
-  init();
+  fetchSoftwareDetails();
+  fetchComments();
 });

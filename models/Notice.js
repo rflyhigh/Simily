@@ -1,4 +1,3 @@
-// FILE: /models/Notice.js
 const mongoose = require('mongoose');
 
 const NoticeSchema = new mongoose.Schema({
