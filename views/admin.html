@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Simily</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="icon" href="/img/favicon.ico">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="logo">
+        <h1><a href="/">Simily</a></h1>
+      </div>
+      <div class="admin-badge">Admin Panel</div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="admin-nav">
+        <button class="nav-btn active" data-section="software">Manage Software</button>
+        <button class="nav-btn" data-section="notices">Manage Notices</button>
+        <button class="nav-btn" data-section="comments">Manage Comments</button>
+      </div>
+
+      <section id="admin-login" class="admin-section">
+        <h2>Admin Login</h2>
+        <form id="login-form">
+          <div class="form-group">
+            <label for="admin-token">Admin Token</label>
+            <input type="password" id="admin-token" name="token" required>
+          </div>
+          <button type="submit" class="btn">Login</button>
+        </form>
+      </section>
+
+      <section id="software-section" class="admin-section hidden">
+        <h2>Manage Software</h2>
+        
+        <button id="add-software-btn" class="btn">Add New Software</button>
+        
+        <div id="software-form-container" class="form-container hidden">
+            <h3 id="form-title">Add New Software</h3>
+            <form id="software-form">
+                <input type="hidden" id="software-id">
+                <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" name="title" required>
+                </div>
+                <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="6" required></textarea>
+                </div>
+                <div class="form-group">
+                <label for="tags">Tags (comma separated)</label>
+                <input type="text" id="tags" name="tags">
+                </div>
+                <div class="form-group">
+                <label for="image-url">Image URL</label>
+                <input type="url" id="image-url" name="imageUrl" required>
+                </div>
+                <div class="form-group">
+                <label>Download Groups</label>
+                <div id="download-groups-container">
+                    <!-- Download groups will be added here -->
+                </div>
+                <button type="button" id="add-group-btn" class="btn-small">Add Group</button>
+                </div>
+                <div class="form-actions">
+                <button type="submit" class="btn">Save</button>
+                <button type="button" id="cancel-software-btn" class="btn btn-secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+        
+        <div id="software-list" class="admin-list">
+          <!-- Software list will be loaded here -->
+        </div>
+      </section>
+
+      <section id="notices-section" class="admin-section hidden">
+        <h2>Manage Notices</h2>
+        
+        <button id="add-notice-btn" class="btn">Add New Notice</button>
+        
+        <div id="notice-form-container" class="form-container hidden">
+          <h3 id="notice-form-title">Add New Notice</h3>
+          <form id="notice-form">
+            <input type="hidden" id="notice-id">
+            <div class="form-group">
+              <label for="notice-content">Content</label>
+              <textarea id="notice-content" name="content" rows="4" required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="notice-active">
+                <input type="checkbox" id="notice-active" name="active" checked>
+                Active
+              </label>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn">Save</button>
+              <button type="button" id="cancel-notice-btn" class="btn btn-secondary">Cancel</button>
+            </div>
+          </form>
+        </div>
+        
+        <div id="notice-list" class="admin-list">
+          <!-- Notice list will be loaded here -->
+        </div>
+      </section>
+
+      <section id="comments-section" class="admin-section hidden">
+        <h2>Manage Comments</h2>
+        
+        <div id="comments-list" class="admin-list">
+          <!-- Comments list will be loaded here -->
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>

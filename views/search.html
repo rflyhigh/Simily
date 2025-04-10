@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search - Simily</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="icon" href="/img/favicon.ico">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="logo">
+        <h1><a href="/">Simily</a></h1>
+      </div>
+      <nav>
+        <div class="search-container">
+          <input type="text" id="search-input" placeholder="Search software...">
+          <button id="search-button">Search</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section class="search-results-section">
+        <div class="section-header">
+          <h2 id="search-title">Browse All Software</h2>
+          <div class="filter-container">
+            <label for="sort-select">Sort by:</label>
+            <select id="sort-select">
+              <option value="newest">Newest</option>
+              <option value="popular">Most Downloaded</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="tag-filters" class="tag-filters">
+          <!-- Tag filters will be loaded here -->
+        </div>
+
+        <div id="search-results" class="software-grid">
+          <!-- Search results will be loaded here -->
+        </div>
+
+        <div id="pagination" class="pagination">
+          <!-- Pagination will be loaded here -->
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <nav class="footer-nav">
+        <a href="/">Home</a>
+        <a href="/search">Browse All</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="/js/search.js"></script>
+</body>
+</html>
