@@ -859,3 +859,63 @@
 .copy-all-btn:active {
   transform: translateY(1px);
 }
+/* Comment notification styles */
+.comment-notification {
+  margin-bottom: 20px;
+  padding: 15px;
+  border-radius: 10px;
+  animation: fadeIn 0.3s ease-out;
+  position: relative;
+}
+
+.comment-notification.success {
+  background-color: rgba(11, 232, 129, 0.1);
+  border-left: 4px solid var(--success-color);
+}
+
+.comment-notification.error {
+  background-color: rgba(255, 94, 87, 0.1);
+  border-left: 4px solid var(--error-color);
+}
+
+.comment-notification.info {
+  background-color: rgba(108, 92, 231, 0.1);
+  border-left: 4px solid var(--accent-color);
+}
+
+.notification-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notification-message {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.notification-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0 5px;
+  transition: color var(--transition-medium);
+}
+
+.notification-close:hover {
+  color: var(--text-color);
+}
+
+.comment-notification.success .notification-message {
+  color: var(--success-color);
+}
+
+.comment-notification.error .notification-message {
+  color: var(--error-color);
+}
+
+.comment-notification.info .notification-message {
+  color: var(--accent-color);
+}

@@ -15,12 +15,16 @@
         <h1><a href="/">Simily</a></h1>
       </div>
       <div class="admin-badge">Admin Panel</div>
+      <div class="admin-search-container hidden">
+        <input type="text" id="admin-search-input" placeholder="Search...">
+        <button id="admin-search-button">Search</button>
+      </div>
     </div>
   </header>
 
   <main>
     <div class="container">
-      <div class="admin-nav">
+      <div class="admin-nav hidden">
         <button class="nav-btn active" data-section="software">Manage Software</button>
         <button class="nav-btn" data-section="notices">Manage Notices</button>
         <button class="nav-btn" data-section="comments">Manage Comments</button>
@@ -114,6 +118,20 @@
 
       <section id="comments-section" class="admin-section hidden">
         <h2>Manage Comments</h2>
+        
+        <div class="comment-filter-container">
+          <div class="filter-group">
+            <label for="comment-software-filter">Filter by Software:</label>
+            <select id="comment-software-filter">
+              <option value="">All Software</option>
+              <!-- Software options will be loaded here -->
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="comment-search">Search Comments:</label>
+            <input type="text" id="comment-search" placeholder="Search by username or content">
+          </div>
+        </div>
         
         <div id="comments-list" class="admin-list">
           <!-- Comments list will be loaded here -->

@@ -3,6 +3,7 @@ const router = express.Router();
 const Software = require('../models/Software');
 const Comment = require('../models/Comment');
 const Notice = require('../models/Notice');
+const BlockedUser = require('../models/BlockedUser');
 const auth = require('../middleware/auth');
 
 // Get all software (paginated)
@@ -150,13 +151,15 @@ router.get('/software/:id/comments', async (req, res) => {
     try {
       const comments = await Comment.find({ 
         softwareId: req.params.id,
-        parentId: null // Get only top-level comments
+        parentId: null, // Get only top-level comments
+        status: 'approved' // Only get approved comments
       }).sort({ createdAt: -1 });
       
       // Get all replies in a single query
       const replies = await Comment.find({
         softwareId: req.params.id,
-        parentId: { $ne: null }
+        parentId: { $ne: null },
+        status: 'approved' // Only get approved replies
       }).sort({ createdAt: 1 });
       
       // Create a map of parent comment ID to replies
@@ -191,6 +194,12 @@ router.get('/software/:id/comments', async (req, res) => {
         return res.status(400).json({ error: 'Username and content are required' });
       }
       
+      // Check if user is blocked
+      const blockedUser = await BlockedUser.findOne({ username });
+      if (blockedUser) {
+        return res.status(403).json({ error: 'Your account has been blocked from commenting' });
+      }
+      
       // Check if software exists
       const software = await Software.findById(req.params.id);
       if (!software) {
@@ -209,7 +218,8 @@ router.get('/software/:id/comments', async (req, res) => {
         softwareId: req.params.id,
         username,
         content,
-        parentId: parentId || null
+        parentId: parentId || null,
+        status: 'approved' // Default to approved, admin can change later
       });
       
       await newComment.save();
