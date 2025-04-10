@@ -1,0 +1,78 @@
+<!-- FILE: profile.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile - Simily</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/profile.css">
+  <link rel="icon" href="/img/favicon.ico">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="logo">
+        <h1><a href="/">Simily</a></h1>
+      </div>
+      <nav>
+        <div class="search-container">
+          <input type="text" id="search-input" placeholder="Search...">
+          <button id="search-button">Search</button>
+        </div>
+        <div class="nav-links" id="nav-links">
+          <!-- User links will be loaded here -->
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section class="profile-header">
+        <div id="profile-info">
+          <!-- Profile info will be loaded here -->
+        </div>
+      </section>
+
+      <section class="profile-content">
+        <div class="profile-tabs">
+          <button class="tab-btn active" data-tab="posts">Posts</button>
+          <button class="tab-btn" data-tab="comments">Comments</button>
+          <button class="tab-btn" data-tab="upvoted">Upvoted</button>
+        </div>
+
+        <div id="posts-tab" class="tab-content">
+          <div id="user-posts" class="post-grid">
+            <!-- User posts will be loaded here -->
+          </div>
+        </div>
+
+        <div id="comments-tab" class="tab-content hidden">
+          <div id="user-comments" class="comments-list">
+            <!-- User comments will be loaded here -->
+          </div>
+        </div>
+
+        <div id="upvoted-tab" class="tab-content hidden">
+          <div id="user-upvoted" class="post-grid">
+            <!-- User upvoted posts will be loaded here -->
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <nav class="footer-nav">
+        <a href="/">Home</a>
+        <a href="/search">Browse All</a>
+        <a href="/upload" id="upload-link">Upload</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="/js/profile.js"></script>
+</body>
+</html>

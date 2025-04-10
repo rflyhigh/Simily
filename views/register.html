@@ -1,0 +1,59 @@
+<!-- FILE: register.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - Simily</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/auth.css">
+  <link rel="icon" href="/img/favicon.ico">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="logo">
+        <h1><a href="/">Simily</a></h1>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="auth-container">
+        <h2>Create an Account</h2>
+        <form id="register-form">
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+          </div>
+          <div class="form-group">
+            <label for="confirm-password">Confirm Password</label>
+            <input type="password" id="confirm-password" name="confirmPassword" required>
+          </div>
+          <div id="register-error" class="error-message hidden"></div>
+          <button type="submit" class="btn">Register</button>
+        </form>
+        <div class="auth-links">
+          <p>Already have an account? <a href="/login">Login</a></p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <nav class="footer-nav">
+        <a href="/">Home</a>
+        <a href="/search">Browse All</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="/js/register.js"></script>
+</body>
+</html>

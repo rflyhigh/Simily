@@ -1,9 +1,10 @@
+<!-- FILE: index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simily - Software Sharing Platform</title>
+  <title>Simily - Share What You Love</title>
   <link rel="stylesheet" href="/css/main.css">
   <link rel="icon" href="/img/favicon.ico">
 </head>
@@ -15,8 +16,11 @@
       </div>
       <nav>
         <div class="search-container">
-          <input type="text" id="search-input" placeholder="Search software...">
+          <input type="text" id="search-input" placeholder="Search...">
           <button id="search-button">Search</button>
+        </div>
+        <div class="nav-links" id="nav-links">
+          <!-- User links will be loaded here -->
         </div>
       </nav>
     </div>
@@ -33,14 +37,14 @@
           <h2>Recent Uploads</h2>
           <a href="/search?sort=recent" class="view-all">View All</a>
         </div>
-        <div id="recent-software" class="software-grid">
-          <!-- Recent software will be loaded here -->
+        <div id="recent-posts" class="post-grid">
+          <!-- Recent posts will be loaded here -->
         </div>
       </section>
 
       <section class="popular-section">
         <div class="section-header">
-          <h2>Most Downloaded</h2>
+          <h2>Most Popular</h2>
           <div class="filter-buttons">
             <button class="filter-btn active" data-period="all">All Time</button>
             <button class="filter-btn" data-period="year">Year</button>
@@ -48,8 +52,17 @@
             <button class="filter-btn" data-period="week">Week</button>
           </div>
         </div>
-        <div id="popular-software" class="software-grid">
-          <!-- Popular software will be loaded here -->
+        <div id="popular-posts" class="post-grid">
+          <!-- Popular posts will be loaded here -->
+        </div>
+      </section>
+
+      <section class="categories-section">
+        <div class="section-header">
+          <h2>Browse Categories</h2>
+        </div>
+        <div id="categories-list" class="categories-list">
+          <!-- Categories will be loaded here -->
         </div>
       </section>
     </div>
@@ -60,6 +73,7 @@
       <nav class="footer-nav">
         <a href="/">Home</a>
         <a href="/search">Browse All</a>
+        <a href="/upload" id="upload-link">Upload</a>
       </nav>
     </div>
   </footer>

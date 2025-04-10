@@ -1,6 +1,4 @@
-// FILE: /middleware/auth.js
-const jwt = require('jsonwebtoken');
-
+// FILE: /middleware/adminAuth.js
 module.exports = function(req, res, next) {
   // Get token from header
   const token = req.header('x-auth-token');
@@ -12,8 +10,9 @@ module.exports = function(req, res, next) {
   
   // Verify token
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded.user;
+    if (token !== process.env.ADMIN_TOKEN) {
+      return res.status(401).json({ error: 'Invalid admin token' });
+    }
     next();
   } catch (err) {
     res.status(401).json({ error: 'Token is not valid' });

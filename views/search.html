@@ -1,3 +1,4 @@
+<!-- FILE: search.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,8 +16,11 @@
       </div>
       <nav>
         <div class="search-container">
-          <input type="text" id="search-input" placeholder="Search software...">
+          <input type="text" id="search-input" placeholder="Search...">
           <button id="search-button">Search</button>
+        </div>
+        <div class="nav-links" id="nav-links">
+          <!-- User links will be loaded here -->
         </div>
       </nav>
     </div>
@@ -26,12 +30,15 @@
     <div class="container">
       <section class="search-results-section">
         <div class="section-header">
-          <h2 id="search-title">Browse All Software</h2>
+          <h2 id="search-title">Browse All Posts</h2>
           <div class="filter-container">
-            <label for="sort-select">Sort by:</label>
+            <select id="category-filter">
+              <option value="all">All Categories</option>
+              <!-- Categories will be loaded here -->
+            </select>
             <select id="sort-select">
               <option value="newest">Newest</option>
-              <option value="popular">Most Downloaded</option>
+              <option value="popular">Most Upvoted</option>
             </select>
           </div>
         </div>
@@ -40,7 +47,7 @@
           <!-- Tag filters will be loaded here -->
         </div>
 
-        <div id="search-results" class="software-grid">
+        <div id="search-results" class="post-grid">
           <!-- Search results will be loaded here -->
         </div>
 
@@ -56,6 +63,7 @@
       <nav class="footer-nav">
         <a href="/">Home</a>
         <a href="/search">Browse All</a>
+        <a href="/upload" id="upload-link">Upload</a>
       </nav>
     </div>
   </footer>

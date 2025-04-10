@@ -1,0 +1,199 @@
+/* FILE: /public/css/profile.css */
+.profile-header {
+  background-color: var(--bg-secondary);
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: var(--card-shadow);
+  animation: fadeIn 0.6s ease-out;
+}
+
+.profile-user {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.profile-username {
+  font-size: 32px;
+  font-weight: 800;
+  margin-bottom: 20px;
+  color: var(--text-color);
+  position: relative;
+  display: inline-block;
+}
+
+.profile-username::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(to right, var(--accent-color), var(--accent-secondary));
+  border-radius: 3px;
+}
+
+.profile-stats {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-bottom: 20px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--accent-color);
+}
+
+.stat-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-top: 5px;
+}
+
+.profile-meta {
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.join-date {
+  font-size: 14px;
+}
+
+.profile-tabs {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 15px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-color) var(--bg-tertiary);
+}
+
+.tab-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  background-color: var(--bg-tertiary);
+  color: var(--text-color);
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all var(--transition-medium);
+  white-space: nowrap;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.tab-btn:hover {
+  background-color: var(--border-color);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+  color: white;
+  box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+}
+
+.tab-content {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.profile-comment {
+  background-color: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--card-shadow);
+  transition: all var(--transition-medium);
+  border-left: 3px solid var(--accent-color);
+}
+
+.profile-comment:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.comment-post-title {
+  font-weight: 700;
+  color: var(--accent-color);
+  font-size: 16px;
+  text-decoration: none;
+  transition: color var(--transition-medium);
+}
+
+.comment-post-title:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+.comment-date {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.comment-content {
+  color: var(--text-color);
+  white-space: pre-line;
+  line-height: 1.7;
+  font-size: 16px;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .profile-stats {
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .profile-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .tab-btn {
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-header {
+    padding: 20px;
+  }
+  
+  .profile-username {
+    font-size: 28px;
+  }
+  
+  .profile-stats {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .profile-comment {
+    padding: 15px;
+  }
+}
