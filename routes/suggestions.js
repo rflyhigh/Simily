@@ -5,9 +5,10 @@ const Post = require('../models/Post');
 const User = require('../models/User');
 const PostSuggestion = require('../models/PostSuggestion');
 const auth = require('../middleware/auth');
+const { voteLimiter, reportLimiter } = require('../middleware/rateLimiter');
 
 // Create a post suggestion
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, reportLimiter, async (req, res) => {
   try {
     const { postId, title, description, category, tags, imageUrl, downloadGroups, message } = req.body;
     
@@ -93,7 +94,7 @@ router.get('/post/:postId', auth, async (req, res) => {
 });
 
 // Vote on a suggestion
-router.post('/:id/vote', auth, async (req, res) => {
+router.post('/:id/vote', auth, voteLimiter, async (req, res) => {
   try {
     const { vote } = req.body;
     

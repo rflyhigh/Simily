@@ -5,9 +5,10 @@ const Post = require('../models/Post');
 const User = require('../models/User');
 const LinkReport = require('../models/LinkReport');
 const auth = require('../middleware/auth');
+const { reportLimiter } = require('../middleware/rateLimiter');
 
 // Report a link
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, reportLimiter, async (req, res) => {
   try {
     const { postId, groupIndex, linkIndex, reason } = req.body;
     

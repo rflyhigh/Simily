@@ -8,6 +8,7 @@ const User = require('../models/User');
 const Report = require('../models/Report');
 const auth = require('../middleware/auth');
 const mongoose = require('mongoose');
+const { commentLimiter, voteLimiter } = require('../middleware/rateLimiter');
 
 // Get all posts (paginated)
 router.get('/', async (req, res) => {
@@ -428,7 +429,7 @@ router.post('/:id/view', async (req, res) => {
 });
 
 // Vote on post
-router.post('/:id/vote', auth, async (req, res) => {
+router.post('/:id/vote', auth, voteLimiter, async (req, res) => {
   try {
     const { vote } = req.body;
     
@@ -609,7 +610,7 @@ router.get('/:identifier/comments', async (req, res) => {
 });
 
 // Add comment
-router.post('/:identifier/comments', auth, async (req, res) => {
+router.post('/:identifier/comments', auth, commentLimiter, async (req, res) => {
   try {
     const { content, parentId } = req.body;
     

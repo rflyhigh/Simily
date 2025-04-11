@@ -5,9 +5,10 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
 const modAuth = require('../middleware/modAuth');
+const { loginLimiter, registerLimiter } = require('../middleware/rateLimiter');
 
-// Register user
-router.post('/register', async (req, res) => {
+// Register user - apply register rate limiter
+router.post('/register', registerLimiter, async (req, res) => {
   try {
     const { username, password } = req.body;
     
@@ -38,26 +39,25 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'Username is already taken' });
     }
     
+    // Create new user
+    user = new User({
+      username,
+      password
+    });
 
-  // Create new user
-  user = new User({
-    username,
-    password
-  });
-
-  const userCount = await User.countDocuments();
-  if (userCount === 0 || username === process.env.FIRST_MOD_ID) {
-    user.isMod = true;
-    user.modPermissions = {
-      deleteUsers: true,
-      deletePosts: true,
-      deleteComments: true,
-      viewReports: true,
-      resolveReports: true,
-      editPosts: true,
-      promoteMods: true
-    };
-  }
+    const userCount = await User.countDocuments();
+    if (userCount === 0 || username === process.env.FIRST_MOD_ID) {
+      user.isMod = true;
+      user.modPermissions = {
+        deleteUsers: true,
+        deletePosts: true,
+        deleteComments: true,
+        viewReports: true,
+        resolveReports: true,
+        editPosts: true,
+        promoteMods: true
+      };
+    }
     
     await user.save();
     
@@ -83,8 +83,8 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Login user
-router.post('/login', async (req, res) => {
+// Login user - apply login rate limiter
+router.post('/login', loginLimiter, async (req, res) => {
   try {
     const { username, password } = req.body;
     
@@ -148,7 +148,6 @@ router.get('/user', auth, async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
-
 
 // Get unread notification count
 router.get('/notifications/count', auth, async (req, res) => {

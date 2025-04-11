@@ -4,6 +4,7 @@ const router = express.Router();
 const Comment = require('../models/Comment');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
+const { voteLimiter } = require('../middleware/rateLimiter');
 
 // Delete comment
 router.delete('/:id', auth, async (req, res) => {
@@ -41,7 +42,7 @@ router.delete('/:id', auth, async (req, res) => {
 });
 
 // Vote on comment
-router.post('/:id/vote', auth, async (req, res) => {
+router.post('/:id/vote', auth, voteLimiter, async (req, res) => {
   try {
     const { vote } = req.body;
     

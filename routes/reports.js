@@ -3,9 +3,10 @@ const express = require('express');
 const router = express.Router();
 const Report = require('../models/Report');
 const auth = require('../middleware/auth');
+const { reportLimiter } = require('../middleware/rateLimiter');
 
 // Create a report
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, reportLimiter, async (req, res) => {
   try {
     const { targetId, type, reason } = req.body;
     

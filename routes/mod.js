@@ -12,9 +12,10 @@ const PostSuggestion = require('../models/PostSuggestion');
 const auth = require('../middleware/auth');
 const modAuth = require('../middleware/modAuth');
 const checkModPermission = require('../middleware/checkModPermission');
+const { loginLimiter } = require('../middleware/rateLimiter');
 
 // Serve mod login page
-router.get('/login', (req, res) => {
+router.get('/login',loginLimiter, (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'views', 'mod-login.html'));
 });
 
@@ -92,6 +93,7 @@ router.get('/api/posts', modAuth, async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
 router.get('/api/posts/:id', modAuth, async (req, res) => {
   try {
     const post = await Post.findById(req.params.id)
@@ -110,6 +112,7 @@ router.get('/api/posts/:id', modAuth, async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
 // Update post status
 router.put('/api/posts/:id/status', modAuth, checkModPermission('deletePosts'), async (req, res) => {
   try {
