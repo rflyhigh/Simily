@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="download-link-container">
                       <a href="${link.url}" class="download-link" target="_blank" rel="noopener noreferrer" 
                       onclick="recordView('${post._id}')">${link.label}</a>
-                      <button class="report-link-btn" onclick="reportLink('${post._id}', ${groupIndex}, ${linkIndex}, '${link.label}')" title="Report broken link">⛓️‍💥</button>
+                      <button class="report-link-btn" onclick="reportLink('${post._id}', ${groupIndex}, ${linkIndex}, '${link.label}')" title="Report broken link">⚠️</button>
                     </div>
                   `).join('')}
                 </div>
