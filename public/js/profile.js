@@ -123,11 +123,12 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
           <div class="profile-meta">
             <span class="join-date">Joined: ${joinDate}</span>
+            ${!isOwnProfile ? `
+              <button class="report-user-btn" onclick="reportUser('${profileUser._id}', '${profileUser.username}')">Report User</button>
+            ` : ''}
           </div>
         </div>
       `;
-      
-
       
       // Fetch initial tab content (posts)
       fetchUserPosts();
@@ -323,10 +324,142 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Open the report user modal
+  window.reportUser = (userId, username) => {
+    const reportModal = document.getElementById('report-user-modal');
+    const reportUserId = document.getElementById('report-user-id');
+    const reportReason = document.getElementById('report-user-reason');
+    
+    // Set the report details
+    reportUserId.value = userId;
+    reportReason.value = '';
+    
+    // Update modal title to include username
+    const modalTitle = reportModal.querySelector('.modal-header h3');
+    modalTitle.textContent = `Report User: ${username}`;
+    
+    // Show the modal
+    reportModal.classList.add('active');
+    document.body.style.overflow = 'hidden'; // Prevent scrolling
+    
+    // Focus on the reason textarea
+    reportReason.focus();
+  };
+
+  // Close the report modal
+  const closeReportModal = () => {
+    const reportModal = document.getElementById('report-user-modal');
+    reportModal.classList.remove('active');
+    document.body.style.overflow = ''; // Restore scrolling
+  };
+
+  // Submit the user report
+  const submitUserReport = async (e) => {
+    e.preventDefault();
+    
+    const userId = document.getElementById('report-user-id').value;
+    const reason = document.getElementById('report-user-reason').value.trim();
+    
+    if (!reason) {
+      alert('Please provide a reason for reporting this user');
+      return;
+    }
+    
+    try {
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch('/api/reports', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token
+        },
+        body: JSON.stringify({
+          targetId: userId,
+          type: 'user',
+          reason: reason
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to submit report');
+      }
+      
+      // Close the modal
+      closeReportModal();
+      
+      // Show success notification
+      showProfileNotification('success', 'Report submitted successfully. Thank you for helping keep Simily safe.');
+    } catch (error) {
+      console.error('Error reporting user:', error);
+      showProfileNotification('error', 'Failed to submit report. Please try again.');
+    }
+  };
+
+  // Show notification for profile actions
+  const showProfileNotification = (type, message) => {
+    // Remove any existing notifications
+    const existingNotification = document.querySelector('.profile-notification');
+    if (existingNotification) {
+      existingNotification.remove();
+    }
+    
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `profile-notification ${type}`;
+    notification.innerHTML = `
+      <div class="notification-content">
+        <span class="notification-message">${message}</span>
+        <button class="notification-close">&times;</button>
+      </div>
+    `;
+    
+    // Add close button functionality
+    notification.querySelector('.notification-close').addEventListener('click', () => {
+      notification.remove();
+    });
+    
+    // Add to page
+    document.querySelector('.profile-header').after(notification);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+      if (document.body.contains(notification)) {
+        notification.remove();
+      }
+    }, 5000);
+  };
+
   // Initialize page
   const init = async () => {
     await checkAuth();
     fetchProfileData();
+    
+    // Set up report modal event listeners
+    const reportModal = document.getElementById('report-user-modal');
+    if (reportModal) {
+      const reportForm = document.getElementById('report-user-form');
+      const modalClose = reportModal.querySelector('.modal-close');
+      const cancelReport = document.getElementById('cancel-user-report');
+      
+      reportForm.addEventListener('submit', submitUserReport);
+      modalClose.addEventListener('click', closeReportModal);
+      cancelReport.addEventListener('click', closeReportModal);
+      
+      // Close modal when clicking outside of it
+      reportModal.addEventListener('click', (e) => {
+        if (e.target === reportModal) {
+          closeReportModal();
+        }
+      });
+      
+      // Close modal with Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && reportModal.classList.contains('active')) {
+          closeReportModal();
+        }
+      });
+    }
   };
 
   init();

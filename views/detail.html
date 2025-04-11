@@ -7,7 +7,7 @@
   <meta name="description" content="Find direct links to everything you need on Simily. Browse and download software, games, movies, music, books, and more.">
   
   <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website">
+  <meta property="og:type" content="article">
   <meta property="og:url" content="">
   <meta property="og:title" content="">
   <meta property="og:description" content="">
@@ -49,9 +49,9 @@
         <a href="javascript:history.back()">Back</a>
       </div>
 
-      <section id="post-detail" class="post-detail">
+      <article id="post-detail" class="post-detail">
         <!-- Post details will be loaded here -->
-      </section>
+      </article>
 
       <section class="comments-section">
         <h2>Comments</h2>
@@ -77,5 +77,28 @@
   </footer>
 
   <script src="/js/detail.js"></script>
+  <!-- Report Modal -->
+<div id="report-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Report Content</h3>
+      <button class="modal-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="report-form">
+        <input type="hidden" id="report-target-id">
+        <input type="hidden" id="report-type">
+        <div class="form-group">
+          <label for="report-reason">Please provide a reason for reporting this content:</label>
+          <textarea id="report-reason" name="reason" rows="4" required></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn">Submit Report</button>
+          <button type="button" class="btn btn-secondary" id="cancel-report">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 </body>
 </html>

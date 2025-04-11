@@ -71,53 +71,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // Update meta tags with post information
-  const updateMetaTags = (post) => {
-    // Update page title
-    document.title = `${post.title} - Simily`;
-    
-    // Update meta description
-    let metaDescription = document.querySelector('meta[name="description"]');
-    if (!metaDescription) {
-      metaDescription = document.createElement('meta');
-      metaDescription.setAttribute('name', 'description');
-      document.head.appendChild(metaDescription);
-    }
-    metaDescription.setAttribute('content', truncateText(post.description, 160));
-    
-    // Update canonical URL
-    let canonicalLink = document.querySelector('link[rel="canonical"]');
-    if (!canonicalLink) {
-      canonicalLink = document.createElement('link');
-      canonicalLink.setAttribute('rel', 'canonical');
-      document.head.appendChild(canonicalLink);
-    }
-    canonicalLink.setAttribute('href', `https://simily.onrender.com/post/${post.slug}`);
-    
-    // Update Open Graph tags
-    updateOpenGraphTag('og:url', `https://simily.onrender.com/post/${post.slug}`);
-    updateOpenGraphTag('og:title', `${post.title} - Simily`);
-    updateOpenGraphTag('og:description', truncateText(post.description, 160));
-    updateOpenGraphTag('og:image', post.imageUrl);
-    
-    // Update Twitter tags
-    updateOpenGraphTag('twitter:url', `https://simily.onrender.com/post/${post.slug}`);
-    updateOpenGraphTag('twitter:title', `${post.title} - Simily`);
-    updateOpenGraphTag('twitter:description', truncateText(post.description, 160));
-    updateOpenGraphTag('twitter:image', post.imageUrl);
-  };
-
-  // Helper function to update Open Graph and Twitter tags
-  const updateOpenGraphTag = (property, content) => {
-    let tag = document.querySelector(`meta[property="${property}"]`);
-    if (!tag) {
-      tag = document.createElement('meta');
-      tag.setAttribute('property', property);
-      document.head.appendChild(tag);
-    }
-    tag.setAttribute('content', content);
-  };
-
   // Fetch and display post details
   const fetchPostDetails = async () => {
     try {
@@ -134,9 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       const post = await response.json();
-      
-      // Update meta tags for SEO
-      updateMetaTags(post);
       
       // Format tags
       const tagsHTML = post.tags.map(tag => 
@@ -790,44 +740,65 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // Report post
-  window.reportPost = async (id) => {
-    const reason = prompt('Please provide a reason for reporting this post:');
+  // Open the report modal for a post
+  window.reportPost = (id) => {
+    const reportModal = document.getElementById('report-modal');
+    const reportTargetId = document.getElementById('report-target-id');
+    const reportType = document.getElementById('report-type');
+    const reportReason = document.getElementById('report-reason');
     
-    if (!reason) return;
+    // Set the report details
+    reportTargetId.value = id;
+    reportType.value = 'post';
+    reportReason.value = '';
     
-    try {
-      const token = localStorage.getItem('token');
-      
-      const response = await fetch('/api/reports', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-auth-token': token
-        },
-        body: JSON.stringify({
-          targetId: id,
-          type: 'post',
-          reason
-        })
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to submit report');
-      }
-      
-      alert('Report submitted successfully. Thank you for helping keep Simily safe.');
-    } catch (error) {
-      console.error('Error reporting post:', error);
-      alert('Failed to submit report. Please try again.');
-    }
+    // Show the modal
+    reportModal.classList.add('active');
+    document.body.style.overflow = 'hidden'; // Prevent scrolling
+    
+    // Focus on the reason textarea
+    reportReason.focus();
   };
 
-  // Report comment
-  window.reportComment = async (id) => {
-    const reason = prompt('Please provide a reason for reporting this comment:');
+  // Open the report modal for a comment
+  window.reportComment = (id) => {
+    const reportModal = document.getElementById('report-modal');
+    const reportTargetId = document.getElementById('report-target-id');
+    const reportType = document.getElementById('report-type');
+    const reportReason = document.getElementById('report-reason');
     
-    if (!reason) return;
+    // Set the report details
+    reportTargetId.value = id;
+    reportType.value = 'comment';
+    reportReason.value = '';
+    
+    // Show the modal
+    reportModal.classList.add('active');
+    document.body.style.overflow = 'hidden'; // Prevent scrolling
+    
+    // Focus on the reason textarea
+    reportReason.focus();
+  };
+
+  // Close the report modal
+  const closeReportModal = () => {
+    const reportModal = document.getElementById('report-modal');
+    reportModal.classList.remove('active');
+    document.body.style.overflow = ''; // Restore scrolling
+  };
+
+  // Submit the report
+  const submitReport = async (e) => {
+    e.preventDefault();
+    
+    const reportTargetId = document.getElementById('report-target-id').value;
+    const reportType = document.getElementById('report-type').value;
+    const reportReason = document.getElementById('report-reason').value.trim();
+    
+    if (!reportReason) {
+      alert('Please provide a reason for reporting');
+      return;
+    }
     
     try {
       const token = localStorage.getItem('token');
@@ -839,9 +810,9 @@ document.addEventListener('DOMContentLoaded', () => {
           'x-auth-token': token
         },
         body: JSON.stringify({
-          targetId: id,
-          type: 'comment',
-          reason
+          targetId: reportTargetId,
+          type: reportType,
+          reason: reportReason
         })
       });
       
@@ -849,9 +820,13 @@ document.addEventListener('DOMContentLoaded', () => {
         throw new Error('Failed to submit report');
       }
       
-      alert('Report submitted successfully. Thank you for helping keep Simily safe.');
+      // Close the modal
+      closeReportModal();
+      
+      // Show success message
+      showCommentNotification('success', 'Report submitted successfully. Thank you for helping keep Simily safe.');
     } catch (error) {
-      console.error('Error reporting comment:', error);
+      console.error('Error reporting content:', error);
       alert('Failed to submit report. Please try again.');
     }
   };
@@ -904,13 +879,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Helper function to truncate text for meta descriptions
-  const truncateText = (text, maxLength) => {
-    if (!text) return '';
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength - 3) + '...';
-  };
-
   // Initialize page
   const init = async () => {
     const isLoggedIn = await checkAuth();
@@ -918,7 +886,30 @@ document.addEventListener('DOMContentLoaded', () => {
     await fetchPostDetails();
     await fetchComments();
     handleCommentHighlighting(); // Handle comment highlighting after comments are loaded
+    
+    // Set up report modal event listeners
+    const reportModal = document.getElementById('report-modal');
+    const reportForm = document.getElementById('report-form');
+    const modalClose = document.querySelector('.modal-close');
+    const cancelReport = document.getElementById('cancel-report');
+    
+    reportForm.addEventListener('submit', submitReport);
+    modalClose.addEventListener('click', closeReportModal);
+    cancelReport.addEventListener('click', closeReportModal);
+    
+    // Close modal when clicking outside of it
+    reportModal.addEventListener('click', (e) => {
+      if (e.target === reportModal) {
+        closeReportModal();
+      }
+    });
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && reportModal.classList.contains('active')) {
+        closeReportModal();
+      }
+    });
   };
-
   init();
 });

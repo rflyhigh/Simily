@@ -1,10 +1,23 @@
-<!-- FILE: profile.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Profile - Simily</title>
+  <meta name="description" content="View user profile on Simily. Check out their posts, comments, and contributions.">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="profile">
+  <meta property="og:url" content="">
+  <meta property="og:title" content="User Profile - Simily">
+  <meta property="og:description" content="View user profile on Simily. Check out their posts, comments, and contributions.">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary">
+  <meta property="twitter:url" content="">
+  <meta property="twitter:title" content="User Profile - Simily">
+  <meta property="twitter:description" content="View user profile on Simily. Check out their posts, comments, and contributions.">
+  
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="/css/profile.css">
   <link rel="icon" href="/img/favicon.ico">
@@ -74,5 +87,27 @@
   </footer>
 
   <script src="/js/profile.js"></script>
+  <!-- Report User Modal -->
+<div id="report-user-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Report User</h3>
+      <button class="modal-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="report-user-form">
+        <input type="hidden" id="report-user-id">
+        <div class="form-group">
+          <label for="report-user-reason">Please provide a reason for reporting this user:</label>
+          <textarea id="report-user-reason" name="reason" rows="4" required></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn">Submit Report</button>
+          <button type="button" class="btn btn-secondary" id="cancel-user-report">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 </body>
 </html>

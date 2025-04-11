@@ -218,6 +218,7 @@
   background-color: #ff2d20;
 }
 
+/* Report button styles */
 .report-btn {
   padding: 6px 12px;
   border: none;
@@ -230,11 +231,28 @@
   transition: all 0.3s ease;
   font-family: var(--font-primary);
   letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .report-btn:hover {
   background-color: var(--border-color);
   color: var(--text-color);
+}
+
+.report-btn::before {
+  content: "⚠️";
+  font-size: 12px;
+  display: inline-block;
+  opacity: 0.8;
+}
+
+/* Ensure report button is visible in the detail-actions section */
+.detail-actions .report-btn {
+  display: inline-flex;
+  visibility: visible;
+  opacity: 1;
 }
 
 .detail-description {
@@ -620,6 +638,7 @@
   gap: 12px;
   padding-top: 6px;
   border-top: 1px solid var(--border-color);
+  flex-wrap: wrap;
 }
 
 .reply-btn, .delete-comment-btn, .report-btn {
@@ -654,13 +673,50 @@
   background-color: rgba(255, 59, 48, 0.1);
 }
 
-.report-btn {
+/* Comment report button styles */
+.comment-actions .report-btn {
+  background: none;
+  border: none;
+  font-size: 12px;
+  font-weight: 300;
+  cursor: pointer;
+  transition: color 0.3s ease, background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: var(--font-primary);
+  letter-spacing: 0.02em;
   color: var(--text-secondary);
+  visibility: visible;
+  opacity: 1;
 }
 
-.report-btn:hover {
-  color: var(--text-color);
-  background-color: var(--bg-tertiary);
+.comment-actions .report-btn:hover {
+  color: var(--error-color);
+  background-color: rgba(255, 59, 48, 0.1);
+}
+
+.comment-actions .report-btn::before {
+  content: "⚠️";
+  font-size: 11px;
+  display: inline-block;
+  opacity: 0.8;
+}
+
+/* Ensure all comment action buttons are visible */
+.comment-actions button {
+  display: inline-flex;
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Fix for any potential hidden report buttons */
+.reply-btn, .delete-comment-btn, .report-btn {
+  display: inline-flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .reply-form {
@@ -755,6 +811,122 @@
   color: var(--accent-color);
 }
 
+/* Modal styles */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(5px);
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background-color: var(--bg-secondary);
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-color);
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 300;
+  color: var(--text-color);
+  letter-spacing: 0.02em;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.3s ease;
+  padding: 0;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: var(--text-color);
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-body .form-group {
+  margin-bottom: 20px;
+}
+
+.modal-body label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-color);
+  font-weight: 300;
+  font-size: 14px;
+  letter-spacing: 0.01em;
+}
+
+.modal-body textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--bg-tertiary);
+  color: var(--text-color);
+  font-size: 14px;
+  transition: all 0.3s ease;
+  resize: vertical;
+  min-height: 100px;
+  font-family: var(--font-primary);
+  font-weight: 300;
+}
+
+.modal-body textarea:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.modal-body .form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .post-detail {
@@ -781,6 +953,14 @@
   .replies {
     margin-left: 15px;
     padding-left: 10px;
+  }
+  
+  .modal-content {
+    width: 95%;
+  }
+  
+  .modal-body {
+    padding: 15px;
   }
 }
 
@@ -813,11 +993,36 @@
     gap: 8px;
   }
   
+  .detail-actions .report-btn,
+  .detail-actions .edit-btn,
+  .detail-actions .delete-btn {
+    flex: 1;
+    justify-content: center;
+    min-width: 80px;
+  }
+  
   .form-actions {
     flex-direction: column;
   }
   
   .btn, .btn-secondary {
+    width: 100%;
+  }
+  
+  .comment-actions {
+    gap: 8px;
+  }
+  
+  .comment-actions button {
+    padding: 4px 6px;
+    font-size: 11px;
+  }
+  
+  .modal-body .form-actions {
+    flex-direction: column;
+  }
+  
+  .modal-body .form-actions button {
     width: 100%;
   }
 }
@@ -848,8 +1053,33 @@
   
   .comment-actions {
     flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  
+  .comment-actions button {
+    flex: 0 0 auto;
+  }
+  
+  .detail-actions .report-btn,
+  .detail-actions .edit-btn,
+  .detail-actions .delete-btn {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  
+  .modal-header {
+    padding: 12px 15px;
+  }
+  
+  .modal-header h3 {
+    font-size: 16px;
+  }
+  
+  .modal-body {
+    padding: 12px;
   }
 }
+
 .highlighted-comment {
   animation: highlight-pulse 5s ease-out;
   border-color: var(--accent-color) !important;
