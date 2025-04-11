@@ -352,3 +352,63 @@
   color: var(--text-color);
   background-color: var(--border-color);
 }
+/* Add these styles to your upload.css file */
+
+.bulk-url-options {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.label-prefix-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.label-prefix-container input {
+  width: 80px;
+  padding: 6px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--bg-tertiary);
+  color: var(--text-color);
+  font-size: 13px;
+}
+
+.process-options {
+  display: flex;
+  align-items: center;
+}
+
+.process-options label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: var(--text-color);
+}
+
+.bulk-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.clear-all-btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  background-color: var(--error-color);
+  color: white;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.clear-all-btn:hover {
+  background-color: #ff2d20;
+}
