@@ -1024,26 +1024,66 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  window.viewReportedItem = (id, type) => {
-    if (type === 'post') {
-      window.open(`/post/${id}`, '_blank');
-    } else if (type === 'comment') {
-      // Find the post ID for this comment and navigate to it
-      fetch(`/admin/api/comments/${id}`, {
-        headers: {
-          'x-auth-token': adminToken
+  window.viewReportedItem = async (id, type) => {
+    try {
+      if (type === 'post') {
+        // Fetch the post first to get its slug
+        const response = await fetch(`/admin/api/posts/${id}`, {
+          headers: {
+            'x-auth-token': adminToken
+          }
+        });
+        
+        if (response.ok) {
+          const post = await response.json();
+          window.open(`/post/${post.slug}`, '_blank');
+        } else {
+          throw new Error('Failed to fetch post');
         }
-      })
-      .then(response => response.json())
-      .then(comment => {
-        window.open(`/post/${comment.postId}#comment-${id}`, '_blank');
-      })
-      .catch(error => {
-        console.error('Error fetching comment details:', error);
-        alert('Failed to load comment details');
-      });
-    } else if (type === 'user') {
-      window.open(`/user/${id}`, '_blank');
+      } else if (type === 'comment') {
+        // Fetch the comment to get its post ID
+        const response = await fetch(`/admin/api/comments/${id}`, {
+          headers: {
+            'x-auth-token': adminToken
+          }
+        });
+        
+        if (response.ok) {
+          const comment = await response.json();
+          // Fetch the post to get its slug
+          const postResponse = await fetch(`/admin/api/posts/${comment.postId._id}`, {
+            headers: {
+              'x-auth-token': adminToken
+            }
+          });
+          
+          if (postResponse.ok) {
+            const post = await postResponse.json();
+            window.open(`/post/${post.slug}#comment-${id}`, '_blank');
+          } else {
+            throw new Error('Failed to fetch post for comment');
+          }
+        } else {
+          throw new Error('Failed to fetch comment');
+        }
+      } else if (type === 'user') {
+        // Fetch the user to get their username
+        const response = await fetch(`/admin/api/users/${id}`, {
+          headers: {
+            'x-auth-token': adminToken
+          }
+        });
+        
+        if (response.ok) {
+          const user = await response.json();
+          window.open(`/user/${user.username}`, '_blank');
+        } else {
+          throw new Error('Failed to fetch user');
+        }
+      }
+    } catch (error) {
+      console.error('Error viewing reported item:', error);
+      alert('Failed to view item: ' + error.message);
     }
   };
 

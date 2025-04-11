@@ -525,4 +525,23 @@ router.get('/api/posts/:id', adminAuth, async (req, res) => {
   }
 });
 
+router.get('/api/comments/:id', adminAuth, async (req, res) => {
+  try {
+    const comment = await Comment.findById(req.params.id)
+      .populate('postId', 'title slug');
+    
+    if (!comment) {
+      return res.status(404).json({ error: 'Comment not found' });
+    }
+    
+    res.json(comment);
+  } catch (err) {
+    console.error('Error fetching comment by ID:', err);
+    if (err.kind === 'ObjectId') {
+      return res.status(404).json({ error: 'Comment not found' });
+    }
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 module.exports = router;

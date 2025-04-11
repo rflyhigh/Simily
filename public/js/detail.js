@@ -71,6 +71,53 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  // Update meta tags with post information
+  const updateMetaTags = (post) => {
+    // Update page title
+    document.title = `${post.title} - Simily`;
+    
+    // Update meta description
+    let metaDescription = document.querySelector('meta[name="description"]');
+    if (!metaDescription) {
+      metaDescription = document.createElement('meta');
+      metaDescription.setAttribute('name', 'description');
+      document.head.appendChild(metaDescription);
+    }
+    metaDescription.setAttribute('content', truncateText(post.description, 160));
+    
+    // Update canonical URL
+    let canonicalLink = document.querySelector('link[rel="canonical"]');
+    if (!canonicalLink) {
+      canonicalLink = document.createElement('link');
+      canonicalLink.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonicalLink);
+    }
+    canonicalLink.setAttribute('href', `https://simily.onrender.com/post/${post.slug}`);
+    
+    // Update Open Graph tags
+    updateOpenGraphTag('og:url', `https://simily.onrender.com/post/${post.slug}`);
+    updateOpenGraphTag('og:title', `${post.title} - Simily`);
+    updateOpenGraphTag('og:description', truncateText(post.description, 160));
+    updateOpenGraphTag('og:image', post.imageUrl);
+    
+    // Update Twitter tags
+    updateOpenGraphTag('twitter:url', `https://simily.onrender.com/post/${post.slug}`);
+    updateOpenGraphTag('twitter:title', `${post.title} - Simily`);
+    updateOpenGraphTag('twitter:description', truncateText(post.description, 160));
+    updateOpenGraphTag('twitter:image', post.imageUrl);
+  };
+
+  // Helper function to update Open Graph and Twitter tags
+  const updateOpenGraphTag = (property, content) => {
+    let tag = document.querySelector(`meta[property="${property}"]`);
+    if (!tag) {
+      tag = document.createElement('meta');
+      tag.setAttribute('property', property);
+      document.head.appendChild(tag);
+    }
+    tag.setAttribute('content', content);
+  };
+
   // Fetch and display post details
   const fetchPostDetails = async () => {
     try {
@@ -88,8 +135,8 @@ document.addEventListener('DOMContentLoaded', () => {
       
       const post = await response.json();
       
-      // Update page title
-      document.title = `${post.title} - Simily`;
+      // Update meta tags for SEO
+      updateMetaTags(post);
       
       // Format tags
       const tagsHTML = post.tags.map(tag => 
@@ -235,6 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  // Fetch comments
   const fetchComments = async () => {
     try {
       // Get post ID from URL
@@ -563,6 +611,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 5000);
   };
 
+  // Function to handle comment highlighting and scrolling
+  const handleCommentHighlighting = () => {
+    // Check if URL has a comment hash
+    if (window.location.hash && window.location.hash.startsWith('#comment-')) {
+      const commentId = window.location.hash.substring(9); // Remove '#comment-' prefix
+      
+      // Wait for comments to load
+      setTimeout(() => {
+        const commentElement = document.getElementById(`comment-${commentId}`);
+        if (commentElement) {
+          // Scroll to the comment
+          commentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          
+          // Add highlight effect
+          commentElement.classList.add('highlighted-comment');
+          
+          // Remove highlight after 5 seconds
+          setTimeout(() => {
+            commentElement.classList.remove('highlighted-comment');
+          }, 5000);
+        }
+      }, 1000); // Wait 1 second for comments to load
+    }
+  };
+
   // Record view
   window.recordView = async (id) => {
     try {
@@ -574,7 +647,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // Vote on post
+  // Vote on post without reloading page
   window.votePost = async (id, voteType) => {
     try {
       if (!userData) {
@@ -597,8 +670,64 @@ document.addEventListener('DOMContentLoaded', () => {
         throw new Error('Failed to vote');
       }
       
-      // Refresh post details to update vote counts
-      fetchPostDetails();
+      // Update vote counts without reloading page
+      const upvoteBtn = document.querySelector('.vote-btn.upvote');
+      const downvoteBtn = document.querySelector('.vote-btn.downvote');
+      const upvoteCount = upvoteBtn.querySelector('.vote-count');
+      const downvoteCount = downvoteBtn.querySelector('.vote-count');
+      
+      // Get current counts
+      let upvotes = parseInt(upvoteCount.textContent);
+      let downvotes = parseInt(downvoteCount.textContent);
+      
+      // Update UI based on vote type
+      if (voteType === 'up') {
+        if (upvoteBtn.classList.contains('voted')) {
+          // Remove upvote
+          upvoteBtn.classList.remove('voted');
+          upvoteCount.textContent = upvotes - 1;
+        } else {
+          // Add upvote
+          upvoteBtn.classList.add('voted');
+          upvoteCount.textContent = upvotes + 1;
+          
+          // Remove downvote if exists
+          if (downvoteBtn.classList.contains('voted')) {
+            downvoteBtn.classList.remove('voted');
+            downvoteCount.textContent = downvotes - 1;
+          }
+        }
+      } else if (voteType === 'down') {
+        if (downvoteBtn.classList.contains('voted')) {
+          // Remove downvote
+          downvoteBtn.classList.remove('voted');
+          downvoteCount.textContent = downvotes - 1;
+        } else {
+          // Add downvote
+          downvoteBtn.classList.add('voted');
+          downvoteCount.textContent = downvotes + 1;
+          
+          // Remove upvote if exists
+          if (upvoteBtn.classList.contains('voted')) {
+            upvoteBtn.classList.remove('voted');
+            upvoteCount.textContent = upvotes - 1;
+          }
+        }
+      }
+      
+      // Update stats section
+      const statsSection = document.querySelector('.stats');
+      if (statsSection) {
+        const newUpvotes = parseInt(upvoteCount.textContent);
+        const newDownvotes = parseInt(downvoteCount.textContent);
+        const totalVotes = newUpvotes + newDownvotes;
+        const percentage = totalVotes > 0 ? Math.round((newUpvotes / totalVotes) * 100) : 0;
+        
+        const pointsSpan = statsSection.querySelector('span:nth-child(2)');
+        if (pointsSpan) {
+          pointsSpan.textContent = `${newUpvotes - newDownvotes} points (${percentage}% upvoted)`;
+        }
+      }
     } catch (error) {
       console.error('Error voting:', error);
       alert('Failed to vote. Please try again.');
@@ -775,12 +904,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Helper function to truncate text for meta descriptions
+  const truncateText = (text, maxLength) => {
+    if (!text) return '';
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength - 3) + '...';
+  };
+
   // Initialize page
   const init = async () => {
     const isLoggedIn = await checkAuth();
     prepareCommentForm(isLoggedIn);
-    fetchPostDetails();
-    fetchComments();
+    await fetchPostDetails();
+    await fetchComments();
+    handleCommentHighlighting(); // Handle comment highlighting after comments are loaded
   };
 
   init();
