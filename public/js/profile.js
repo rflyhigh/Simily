@@ -108,29 +108,29 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Render profile info
       profileInfo.innerHTML = `
-        <div class="profile-user">
-          <div class="profile-username">${modBadge}${profileUser.username}</div>
-          <div class="profile-stats">
-            <div class="stat">
-              <span class="stat-value">${profileUser.reputation}</span>
-              <span class="stat-label">Reputation</span>
-            </div>
-            <div class="stat">
-              <span class="stat-value">${profileUser.postCount}</span>
-              <span class="stat-label">Posts</span>
-            </div>
-            <div class="stat">
-              <span class="stat-value">${profileUser.commentCount}</span>
-              <span class="stat-label">Comments</span>
-            </div>
+      <div class="profile-user">
+        <div class="profile-username">${modBadge}${profileUser.username}</div>
+        <div class="profile-stats">
+          <div class="stat">
+            <span class="stat-value">${profileUser.reputation}</span>
+            <span class="stat-label">Reputation</span>
           </div>
-          <div class="profile-meta">
-            <span class="join-date">Joined: ${joinDate}</span>
-            ${!isOwnProfile ? `
-              <button class="report-user-btn" onclick="reportUser('${profileUser._id}', '${profileUser.username}')">Report User</button>
-            ` : ''}
+          <div class="stat">
+            <span class="stat-value">${profileUser.postCount}</span>
+            <span class="stat-label">Posts</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">${profileUser.commentCount}</span>
+            <span class="stat-label">Comments</span>
           </div>
         </div>
+        <div class="profile-meta">
+          <span class="join-date">Joined: ${joinDate}</span>
+          ${currentUser && !isOwnProfile ? `
+            <button class="report-user-btn" onclick="reportUser('${profileUser._id}', '${profileUser.username}')">Report User</button>
+          ` : ''}
+        </div>
+      </div>
       `;
       
       // Fetch initial tab content (posts)

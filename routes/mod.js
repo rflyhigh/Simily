@@ -839,6 +839,35 @@ router.put('/api/suggestions/:id/approve', modAuth, checkModPermission('editPost
   }
 });
 
+// Get a single user by ID (for mod)
+router.get('/api/users/:id', modAuth, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select('-password');
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    // Get post and comment counts for the user
+    const postCount = await Post.countDocuments({ author: user._id });
+    const commentCount = await Comment.countDocuments({ userId: user._id });
+    
+    const userWithCounts = {
+      ...user.toObject(),
+      postCount,
+      commentCount
+    };
+    
+    res.json(userWithCounts);
+  } catch (err) {
+    console.error('Error fetching user by ID:', err);
+    if (err.kind === 'ObjectId') {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // Reject post suggestion
 router.put('/api/suggestions/:id/reject', modAuth, checkModPermission('editPosts'), async (req, res) => {
   try {
