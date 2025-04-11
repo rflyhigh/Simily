@@ -30,10 +30,21 @@ const CommentSchema = new mongoose.Schema({
     enum: ['approved', 'held', 'blocked'],
     default: 'approved'
   },
+  upvotes: {
+    type: Number,
+    default: 0
+  },
+  downvotes: {
+    type: Number,
+    default: 0
+  },
   createdAt: {
     type: Date,
     default: Date.now
   }
 });
+
+// Add compound index for sorting by votes
+CommentSchema.index({ postId: 1, parentId: 1, upvotes: -1, downvotes: 1 });
 
 module.exports = mongoose.model('Comment', CommentSchema);

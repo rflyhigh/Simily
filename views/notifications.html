@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notifications - Simily</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/notifications.css">
+  <link rel="icon" href="/img/favicon.ico">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="logo">
+        <h1><a href="/">Simily</a></h1>
+      </div>
+      <nav>
+        <div class="search-container">
+          <input type="text" id="search-input" placeholder="Search...">
+          <button id="search-button">Search</button>
+        </div>
+        <div class="nav-links" id="nav-links">
+          <!-- User links will be loaded here -->
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="back-link">
+        <a href="javascript:history.back()">Back</a>
+      </div>
+
+      <section class="notifications-section">
+        <div class="section-header">
+          <h2>Your Notifications</h2>
+          <button id="mark-all-read" class="btn-small">Mark All Read</button>
+        </div>
+
+        <div class="notification-filters">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="suggestion">Suggestions</button>
+          <button class="filter-btn" data-filter="report">Reports</button>
+          <button class="filter-btn" data-filter="approval">Approvals</button>
+          <button class="filter-btn" data-filter="promotion">System</button>
+        </div>
+        
+        <div id="notifications-list" class="notifications-list">
+          <!-- Notifications will be loaded here -->
+        </div>
+      </section>
+
+      <section id="post-suggestions-section" class="suggestions-section">
+        <h2>Post Change Suggestions</h2>
+        
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="pending">Pending</button>
+          <button class="tab-btn" data-tab="approved">Approved</button>
+          <button class="tab-btn" data-tab="rejected">Rejected</button>
+        </div>
+        
+        <div id="pending-suggestions" class="tab-content">
+          <!-- Pending suggestions will be loaded here -->
+        </div>
+        
+        <div id="approved-suggestions" class="tab-content hidden">
+          <!-- Approved suggestions will be loaded here -->
+        </div>
+        
+        <div id="rejected-suggestions" class="tab-content hidden">
+          <!-- Rejected suggestions will be loaded here -->
+        </div>
+      </section>
+
+      <section id="link-reports-section" class="link-reports-section">
+        <h2>Link Reports on Your Posts</h2>
+        
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="pending-reports">Pending</button>
+          <button class="tab-btn" data-tab="resolved-reports">Resolved</button>
+          <button class="tab-btn" data-tab="dismissed-reports">Dismissed</button>
+        </div>
+        
+        <div id="pending-reports" class="tab-content">
+          <!-- Pending reports will be loaded here -->
+        </div>
+        
+        <div id="resolved-reports" class="tab-content hidden">
+          <!-- Resolved reports will be loaded here -->
+        </div>
+        
+        <div id="dismissed-reports" class="tab-content hidden">
+          <!-- Dismissed reports will be loaded here -->
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <nav class="footer-nav">
+        <a href="/">Home</a>
+        <a href="/search">Browse All</a>
+        <a href="/upload" id="upload-link">Upload</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="/js/notifications.js"></script>
+</body>
+</html>

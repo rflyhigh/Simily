@@ -20,6 +20,19 @@ const UserSchema = new mongoose.Schema({
     enum: ['active', 'blocked'],
     default: 'active'
   },
+  isMod: {
+    type: Boolean,
+    default: false
+  },
+  modPermissions: {
+    deleteUsers: { type: Boolean, default: false },
+    deletePosts: { type: Boolean, default: false },
+    deleteComments: { type: Boolean, default: false },
+    viewReports: { type: Boolean, default: false },
+    resolveReports: { type: Boolean, default: false },
+    editPosts: { type: Boolean, default: false },
+    promoteMods: { type: Boolean, default: false }
+  },
   reputation: {
     type: Number,
     default: 0
@@ -31,6 +44,46 @@ const UserSchema = new mongoose.Schema({
   downvotedPosts: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Post'
+  }],
+  upvotedComments: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Comment'
+  }],
+  downvotedComments: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Comment'
+  }],
+  notifications: [{
+    type: {
+      type: String,
+      enum: ['suggestion', 'approval', 'report', 'promotion'],
+      required: true
+    },
+    targetId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true
+    },
+    targetType: {
+      type: String,
+      enum: ['post', 'comment', 'link', 'user'],
+      required: true
+    },
+    message: {
+      type: String,
+      required: true
+    },
+    postSlug: {
+      type: String,
+      default: null
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    },
+    read: {
+      type: Boolean,
+      default: false
+    }
   }],
   createdAt: {
     type: Date,

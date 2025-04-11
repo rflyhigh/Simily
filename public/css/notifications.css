@@ -1,0 +1,604 @@
+/* FILE: /public/css/notifications.css */
+.notifications-section {
+  margin-bottom: 30px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-header h2 {
+  font-size: 20px;
+  font-weight: 300;
+  color: var(--text-color);
+  letter-spacing: 0.02em;
+}
+
+.notification-filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-color) var(--bg-tertiary);
+}
+
+.filter-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 300;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  font-family: var(--font-primary);
+  letter-spacing: 0.02em;
+}
+
+.filter-btn:hover {
+  background-color: var(--border-color);
+  color: var(--text-color);
+}
+
+.filter-btn.active {
+  background-color: var(--accent-color);
+  color: white;
+}
+
+.notifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.notification-item {
+  background-color: var(--bg-secondary);
+  border-radius: 6px;
+  padding: 15px;
+  border: 1px solid var(--border-color);
+  position: relative;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: stretch;
+}
+
+.notification-item:hover {
+  border-color: var(--accent-color);
+}
+
+.notification-item.unread {
+  background-color: rgba(61, 138, 253, 0.05);
+  border-left: 3px solid var(--accent-color);
+}
+
+/* Notification type indicator */
+.notification-type-indicator {
+  width: 4px;
+  border-radius: 2px;
+  margin-right: 15px;
+  flex-shrink: 0;
+}
+
+.notification-type-indicator.suggestion {
+  background-color: var(--accent-color);
+}
+
+.notification-type-indicator.report {
+  background-color: var(--error-color);
+}
+
+.notification-type-indicator.approval {
+  background-color: var(--success-color);
+}
+
+.notification-type-indicator.promotion {
+  background-color: #9c27b0;
+}
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-message {
+  font-size: 14px;
+  color: var(--text-color);
+  margin-bottom: 8px;
+  line-height: 1.5;
+  font-weight: 300;
+  letter-spacing: 0.01em;
+}
+
+.notification-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.notification-actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  margin-left: 15px;
+}
+
+.mark-read-btn {
+  padding: 4px 8px;
+  background: none;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--font-primary);
+  white-space: nowrap;
+}
+
+.mark-read-btn:hover {
+  background-color: var(--bg-tertiary);
+  color: var(--text-color);
+}
+
+.view-btn {
+  padding: 4px 8px;
+  background-color: var(--accent-color);
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-decoration: none;
+  text-align: center;
+  font-family: var(--font-primary);
+  white-space: nowrap;
+}
+
+.view-btn:hover {
+  background-color: var(--accent-hover);
+}
+
+/* Suggestions section */
+.suggestions-section, .link-reports-section {
+  margin-top: 30px;
+  margin-bottom: 30px;
+  background-color: var(--bg-secondary);
+  border-radius: 6px;
+  padding: 20px;
+  border: 1px solid var(--border-color);
+}
+
+.suggestions-section h2, .link-reports-section h2 {
+  font-size: 18px;
+  font-weight: 300;
+  margin-bottom: 15px;
+  color: var(--text-color);
+  letter-spacing: 0.02em;
+}
+
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-color) var(--bg-tertiary);
+}
+
+.tab-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 300;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  font-family: var(--font-primary);
+  letter-spacing: 0.02em;
+}
+
+.tab-btn:hover {
+  background-color: var(--border-color);
+  color: var(--text-color);
+}
+
+.tab-btn.active {
+  background-color: var(--accent-color);
+  color: white;
+}
+
+.tab-content {
+  margin-top: 15px;
+}
+
+.tab-content.hidden {
+  display: none;
+}
+
+.suggestion-item, .report-item {
+  background-color: var(--bg-tertiary);
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 15px;
+  border: 1px solid var(--border-color);
+}
+
+.suggestion-item:hover, .report-item:hover {
+  border-color: var(--accent-color);
+}
+
+.suggestion-header, .report-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.suggestion-info, .report-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.suggestion-post, .suggestion-author, .suggestion-date,
+.report-post, .report-reporter, .report-date {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.suggestion-post a, .suggestion-author a,
+.report-post a, .report-reporter a {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+
+.suggestion-post a:hover, .suggestion-author a:hover,
+.report-post a:hover, .report-reporter a:hover {
+  text-decoration: underline;
+}
+
+.suggestion-votes {
+  display: flex;
+  gap: 10px;
+}
+
+.vote-count {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.suggestion-message, .report-details {
+  margin-top: 10px;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: var(--bg-secondary);
+  border-radius: 4px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-color);
+  font-weight: 300;
+}
+
+.suggestion-actions, .report-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.approve-btn, .reject-btn, .fix-btn, .dismiss-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-family: var(--font-primary);
+}
+
+.approve-btn {
+  background-color: var(--success-color);
+  color: white;
+}
+
+.approve-btn:hover {
+  background-color: #2aa745;
+}
+
+.reject-btn, .dismiss-btn {
+  background-color: var(--error-color);
+  color: white;
+}
+
+.reject-btn:hover, .dismiss-btn:hover {
+  background-color: #e02d1b;
+}
+
+.fix-btn {
+  background-color: var(--accent-color);
+  color: white;
+}
+
+.fix-btn:hover {
+  background-color: var(--accent-hover);
+}
+
+.report-fix-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.report-fix-form input {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--bg-secondary);
+  color: var(--text-color);
+  font-size: 13px;
+  font-family: var(--font-primary);
+}
+
+.report-fix-form input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+/* Page notification */
+.page-notification {
+  margin-bottom: 15px;
+  padding: 12px;
+  border-radius: 4px;
+  position: relative;
+}
+
+.page-notification.success {
+  background-color: rgba(52, 199, 89, 0.1);
+  border-left: 3px solid var(--success-color);
+}
+
+.page-notification.error {
+  background-color: rgba(255, 59, 48, 0.1);
+  border-left: 3px solid var(--error-color);
+}
+
+.page-notification.info {
+  background-color: rgba(61, 138, 253, 0.1);
+  border-left: 3px solid var(--accent-color);
+}
+
+.notification-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notification-message {
+  font-size: 14px;
+  font-weight: 300;
+  letter-spacing: 0.01em;
+}
+
+.notification-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 4px;
+  transition: color 0.3s ease;
+}
+
+.notification-close:hover {
+  color: var(--text-color);
+}
+
+.page-notification.success .notification-message {
+  color: var(--success-color);
+}
+
+.page-notification.error .notification-message {
+  color: var(--error-color);
+}
+
+.page-notification.info .notification-message {
+  color: var(--accent-color);
+}
+
+/* Notification badge in nav */
+.notification-badge {
+  display: inline-block;
+  background-color: var(--error-color);
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: -5px;
+  right: -5px;
+}
+
+.nav-link {
+  position: relative;
+  display: inline-block;
+  padding-right: 5px;
+}
+
+
+/* Mark all read button */
+#mark-all-read {
+  padding: 6px 12px;
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-color);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--font-primary);
+}
+
+#mark-all-read:hover {
+  background-color: var(--border-color);
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 30px 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-style: italic;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .notification-item {
+    flex-direction: column;
+  }
+  
+  .notification-type-indicator {
+    width: 100%;
+    height: 3px;
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+  
+  .notification-actions {
+    flex-direction: row;
+    margin-left: 0;
+    margin-top: 10px;
+  }
+  
+  .suggestion-header, .report-header {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .suggestion-info, .report-info {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .suggestion-actions, .report-actions {
+    flex-direction: column;
+  }
+  
+  .report-fix-form {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .notification-filters, .tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .section-header h2 {
+    font-size: 18px;
+  }
+  
+  .tab-btn, .filter-btn {
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+}
+
+/* In notifications.css, update the notification-actions and mark-read-btn styles */
+
+.notification-actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  margin-left: 15px;
+  min-width: 80px; /* Ensure minimum width for buttons */
+}
+
+.mark-read-btn {
+  padding: 4px 8px;
+  background: none;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--font-primary);
+  white-space: nowrap;
+  display: block; /* Ensure the button is displayed as a block */
+  width: 100%; /* Make button take full width of its container */
+  text-align: center;
+}
+
+.mark-read-btn:hover {
+  background-color: var(--bg-tertiary);
+  color: var(--text-color);
+  border-color: var(--accent-color);
+}
+
+.view-btn {
+  padding: 4px 8px;
+  background-color: var(--accent-color);
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-decoration: none;
+  text-align: center;
+  font-family: var(--font-primary);
+  white-space: nowrap;
+  display: block; /* Ensure the button is displayed as a block */
+  width: 100%; /* Make button take full width of its container */
+}
+
+.view-btn:hover {
+  background-color: var(--accent-hover);
+}
+
+/* Make sure notification badge is properly positioned */
+.notification-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: var(--error-color);
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  z-index: 1; /* Ensure badge appears above other elements */
+}

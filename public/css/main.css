@@ -811,3 +811,63 @@ footer {
     margin-bottom: 12px;
   }
 }
+
+/* Mod badge */
+.mod-badge {
+  background-color: #9c27b0;
+  color: white;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-right: 4px;
+  letter-spacing: 0.5px;
+}
+
+/* Notification badge in nav */
+.notification-badge {
+  background-color: var(--error-color);
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: -5px;
+  right: -5px;
+}
+
+.nav-link {
+  position: relative;
+}
+.back-link {
+  margin-bottom: 20px;
+}
+
+.back-link a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 500;
+  font-size: 14px;
+  transition: color 0.3s ease;
+  padding: 6px 12px;
+  border-radius: 4px;
+  background-color: var(--bg-tertiary);
+}
+
+.back-link a::before {
+  content: "←";
+  margin-right: 8px;
+}
+
+.back-link a:hover {
+  color: var(--text-color);
+  background-color: var(--border-color);
+}

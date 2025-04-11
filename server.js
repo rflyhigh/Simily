@@ -23,7 +23,9 @@ app.use('/api/comments', require('./routes/comments'));
 app.use('/api/notices', require('./routes/notices'));
 app.use('/api/reports', require('./routes/reports'));
 app.use('/api/categories', require('./routes/categories'));
-app.use('/admin', require('./routes/admin'));
+app.use('/api/suggestions', require('./routes/suggestions'));
+app.use('/api/linkreports', require('./routes/linkreports'));
+app.use('/mod', require('./routes/mod'));
 
 // Serve static pages
 app.get('/', (req, res) => {
@@ -38,7 +40,7 @@ app.get('/search', (req, res) => {
 app.get('/post/:slug', async (req, res) => {
   try {
     // Get the post data
-    const post = await Post.findOne({ slug: req.params.slug }).populate('author', 'username');
+    const post = await Post.findOne({ slug: req.params.slug }).populate('author', 'username isMod');
     
     if (!post) {
       return res.status(404).sendFile(path.join(__dirname, 'views', '404.html'));
@@ -119,6 +121,10 @@ app.get('/register', (req, res) => {
 
 app.get('/upload', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'upload.html'));
+});
+
+app.get('/notifications', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'notifications.html'));
 });
 
 // 404 page

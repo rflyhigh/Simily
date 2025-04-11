@@ -1,10 +1,9 @@
-<!-- FILE: admin.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin - Simily</title>
+  <title>Moderator Panel - Simily</title>
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="/css/admin.css">
   <link rel="icon" href="/img/favicon.ico">
@@ -15,12 +14,13 @@
       <div class="logo">
         <h1><a href="/">Simily</a></h1>
       </div>
-      <div class="admin-badge">Admin Panel</div>
+      <div class="admin-badge">Moderator Panel</div>
       <div class="admin-search-container hidden">
         <input type="text" id="admin-search-input" placeholder="Search...">
         <button id="admin-search-button">Search</button>
       </div>
       <div class="user-controls">
+        <a href="/" class="btn-small">Back to Site</a>
         <button id="logout-btn" class="btn-small">Logout</button>
       </div>
     </div>
@@ -28,12 +28,8 @@
 
   <main>
     <div class="container">
-      <div class="admin-nav">
-        <button class="nav-btn active" data-section="posts">Manage Posts</button>
-        <button class="nav-btn" data-section="users">Manage Users</button>
-        <button class="nav-btn" data-section="notices">Manage Notices</button>
-        <button class="nav-btn" data-section="comments">Manage Comments</button>
-        <button class="nav-btn" data-section="reports">Review Reports</button>
+      <div class="admin-nav" id="mod-nav">
+        <!-- Navigation buttons will be added dynamically based on permissions -->
       </div>
 
       <section id="posts-section" class="admin-section">
@@ -150,9 +146,99 @@
           <!-- Reports list will be loaded here -->
         </div>
       </section>
+
+      <section id="link-reports-section" class="admin-section hidden">
+        <h2>Review Link Reports</h2>
+        
+        <div class="filter-container">
+          <select id="link-report-status-filter">
+            <option value="all">All Reports</option>
+            <option value="pending">Pending</option>
+            <option value="resolved">Resolved</option>
+            <option value="dismissed">Dismissed</option>
+          </select>
+        </div>
+        
+        <div id="link-reports-list" class="admin-list">
+          <!-- Link reports list will be loaded here -->
+        </div>
+      </section>
+
+      <section id="suggestions-section" class="admin-section hidden">
+        <h2>Review Post Suggestions</h2>
+        
+        <div class="filter-container">
+          <select id="suggestion-status-filter">
+            <option value="all">All Suggestions</option>
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+        
+        <div id="suggestions-list" class="admin-list">
+          <!-- Suggestions list will be loaded here -->
+        </div>
+      </section>
+
+      <section id="promote-section" class="admin-section hidden">
+        <h2>Manage Moderators</h2>
+        
+        <div class="filter-container">
+          <input type="text" id="promote-search" placeholder="Search users...">
+        </div>
+        
+        <div id="promote-users-list" class="admin-list">
+          <!-- Users list will be loaded here -->
+        </div>
+        
+        <div id="promote-form-container" class="form-container hidden">
+          <h3 id="promote-form-title">Promote User to Moderator</h3>
+          <form id="promote-form">
+            <input type="hidden" id="promote-user-id">
+            <div class="form-group">
+              <h4>Permissions</h4>
+              <div class="permissions-grid">
+                <label>
+                  <input type="checkbox" id="perm-deleteUsers" name="deleteUsers">
+                  Manage Users
+                </label>
+                <label>
+                  <input type="checkbox" id="perm-deletePosts" name="deletePosts">
+                  Manage Posts
+                </label>
+                <label>
+                  <input type="checkbox" id="perm-deleteComments" name="deleteComments">
+                  Manage Comments
+                </label>
+                <label>
+                  <input type="checkbox" id="perm-viewReports" name="viewReports">
+                  View Reports
+                </label>
+                <label>
+                  <input type="checkbox" id="perm-resolveReports" name="resolveReports">
+                  Resolve Reports
+                </label>
+                <label>
+                  <input type="checkbox" id="perm-editPosts" name="editPosts">
+                  Edit Posts
+                </label>
+                <label>
+                  <input type="checkbox" id="perm-promoteMods" name="promoteMods">
+                  Promote Moderators
+                </label>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn">Save</button>
+              <button type="button" id="cancel-promote-btn" class="btn btn-secondary">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </section>
     </div>
   </main>
 
-  <script src="/js/admin.js"></script>
+  <script src="/js/mod.js"></script>
 </body>
 </html>

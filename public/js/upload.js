@@ -77,7 +77,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Fetch post details for editing
   const fetchPostDetails = async (postId) => {
     try {
-      const response = await fetch(`/api/posts/id/${postId}`);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/posts/id/${postId}`, {
+        headers: {
+          'x-auth-token': token
+        }
+      });
       
       if (!response.ok) {
         if (response.status === 404) {
@@ -89,8 +94,8 @@ document.addEventListener('DOMContentLoaded', () => {
       
       const post = await response.json();
       
-      // Check if current user is the author
-      if (userData._id !== post.author._id) {
+      // Check if current user is the author or a mod with edit permissions
+      if (userData._id !== post.author._id && !(userData.isMod && userData.modPermissions.editPosts)) {
         alert('You do not have permission to edit this post');
         window.location.href = '/';
         return;

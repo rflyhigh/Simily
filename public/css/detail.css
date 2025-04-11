@@ -1097,3 +1097,408 @@
     background-color: transparent;
   }
 }
+
+
+/* Mod badge */
+.mod-badge {
+  background-color: #9c27b0;
+  color: white;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-right: 4px;
+  letter-spacing: 0.5px;
+}
+
+/* Report link button */
+.download-link-container {
+  display: flex;
+  align-items: center;
+}
+
+.download-link {
+  flex: 1;
+}
+
+.report-link-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px;
+  margin-left: 5px;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.report-link-btn:hover {
+  opacity: 1;
+  color: var(--error-color);
+}
+
+/* Suggest button */
+.suggest-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-weight: 300;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--font-primary);
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.suggest-btn:hover {
+  background-color: var(--border-color);
+  color: var(--text-color);
+}
+
+.suggest-btn::before {
+  content: "✏️";
+  font-size: 12px;
+  display: inline-block;
+  opacity: 0.8;
+}
+
+/* View logs button */
+.view-logs-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-weight: 300;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--font-primary);
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.view-logs-btn:hover {
+  background-color: var(--border-color);
+  color: var(--text-color);
+}
+.view-logs-btn::before {
+  content: "📋";
+  font-size: 12px;
+  display: inline-block;
+  opacity: 0.8;
+}
+
+/* Post logs section */
+.post-logs-section {
+  margin-bottom: 30px;
+  background-color: var(--bg-secondary);
+  border-radius: 6px;
+  padding: 20px;
+  border: 1px solid var(--border-color);
+}
+
+.post-logs-section h2 {
+  font-size: 18px;
+  font-weight: 300;
+  margin-bottom: 15px;
+  color: var(--text-color);
+  letter-spacing: 0.02em;
+}
+
+.post-logs-section .tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-color) var(--bg-tertiary);
+}
+
+.post-logs-section .tab-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 300;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  font-family: var(--font-primary);
+  letter-spacing: 0.02em;
+}
+
+.post-logs-section .tab-btn:hover {
+  background-color: var(--border-color);
+  color: var(--text-color);
+}
+
+.post-logs-section .tab-btn.active {
+  background-color: var(--accent-color);
+  color: white;
+}
+
+.post-logs-section .tab-content {
+  margin-top: 15px;
+}
+
+.post-logs-section .tab-content.hidden {
+  display: none;
+}
+
+/* Suggestion items */
+.suggestion-item {
+  background-color: var(--bg-tertiary);
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 15px;
+  border: 1px solid var(--border-color);
+}
+
+.suggestion-item:hover {
+  border-color: var(--accent-color);
+}
+
+.suggestion-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.suggestion-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.suggestion-author, .suggestion-date {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.suggestion-author a {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+
+.suggestion-author a:hover {
+  text-decoration: underline;
+}
+
+.suggestion-votes {
+  display: flex;
+  gap: 10px;
+}
+
+.suggestion-votes .vote-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 12px;
+  transition: color 0.3s ease;
+}
+
+.suggestion-votes .vote-btn.upvote:hover {
+  color: var(--success-color);
+}
+
+.suggestion-votes .vote-btn.downvote:hover {
+  color: var(--error-color);
+}
+
+.suggestion-votes .vote-icon {
+  font-size: 16px;
+}
+
+.suggestion-votes .vote-count {
+  font-size: 12px;
+}
+
+.suggestion-message {
+  margin-top: 10px;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: var(--bg-secondary);
+  border-radius: 4px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-color);
+  font-weight: 300;
+}
+
+.suggestion-changes {
+  margin-bottom: 15px;
+}
+
+.suggestion-changes h4 {
+  font-size: 14px;
+  font-weight: 300;
+  margin-bottom: 8px;
+  color: var(--text-color);
+}
+
+.suggestion-changes ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.suggestion-changes li {
+  margin-bottom: 5px;
+  font-size: 13px;
+  color: var(--text-color);
+  font-weight: 300;
+}
+
+.description-change {
+  display: block;
+  margin-top: 5px;
+  padding: 8px;
+  background-color: var(--bg-tertiary);
+  border-radius: 4px;
+  font-size: 12px;
+  max-height: 100px;
+  overflow-y: auto;
+  white-space: pre-line;
+}
+
+.suggestion-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.approve-btn, .reject-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-family: var(--font-primary);
+}
+
+.approve-btn {
+  background-color: var(--success-color);
+  color: white;
+}
+
+.approve-btn:hover {
+  background-color: #2aa745;
+}
+
+.reject-btn {
+  background-color: var(--error-color);
+  color: white;
+}
+
+.reject-btn:hover {
+  background-color: #e02d1b;
+}
+
+/* Comment voting */
+.comment-voting {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-right: 15px;
+}
+
+.comment-vote-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px;
+  transition: color 0.3s ease;
+}
+
+.comment-vote-btn.upvote:hover,
+.comment-vote-btn.upvote.voted {
+  color: var(--success-color);
+}
+
+.comment-vote-btn.downvote:hover,
+.comment-vote-btn.downvote.voted {
+  color: var(--error-color);
+}
+
+.vote-score {
+  font-size: 13px;
+  color: var(--text-color);
+  min-width: 20px;
+  text-align: center;
+}
+
+/* Modal large size for suggestions */
+.modal-lg {
+  width: 95%;
+  max-width: 800px;
+}
+
+/* Make sure modals are on top of everything */
+.modal {
+  z-index: 9999;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .suggestion-header {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .suggestion-info {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .suggestion-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .approve-btn, .reject-btn {
+    width: 100%;
+  }
+  
+  .suggestion-votes {
+    align-self: flex-end;
+  }
+  
+  .comment-voting {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .post-logs-section .tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  
+  .post-logs-section .tab-btn {
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+}

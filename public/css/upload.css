@@ -326,34 +326,6 @@
     padding: 8px 12px;
   }
 }
-.back-link {
-  margin-bottom: 20px;
-}
-
-.back-link a {
-  color: var(--text-secondary);
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  font-weight: 500;
-  font-size: 14px;
-  transition: color 0.3s ease;
-  padding: 6px 12px;
-  border-radius: 4px;
-  background-color: var(--bg-tertiary);
-}
-
-.back-link a::before {
-  content: "←";
-  margin-right: 8px;
-}
-
-.back-link a:hover {
-  color: var(--text-color);
-  background-color: var(--border-color);
-}
-/* Add these styles to your upload.css file */
-
 .bulk-url-options {
   display: flex;
   justify-content: space-between;

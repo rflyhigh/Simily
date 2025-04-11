@@ -103,10 +103,13 @@ document.addEventListener('DOMContentLoaded', () => {
         day: 'numeric'
       });
       
+      // Add mod badge if user is a moderator
+      const modBadge = profileUser.isMod ? '<span class="mod-badge">MOD</span> ' : '';
+      
       // Render profile info
       profileInfo.innerHTML = `
         <div class="profile-user">
-          <div class="profile-username">${profileUser.username}</div>
+          <div class="profile-username">${modBadge}${profileUser.username}</div>
           <div class="profile-stats">
             <div class="stat">
               <span class="stat-value">${profileUser.reputation}</span>

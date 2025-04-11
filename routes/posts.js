@@ -330,8 +330,12 @@ router.put('/:id', auth, async (req, res) => {
       return res.status(404).json({ error: 'Post not found' });
     }
     
-    // Check if user is the author
-    if (post.author.toString() !== req.user.id) {
+    // Get user to check if they're a mod with edit permissions
+    const user = await User.findById(req.user.id);
+    
+    // Check if user is the author or a mod with edit permissions
+    if (post.author.toString() !== req.user.id && 
+        !(user.isMod && user.modPermissions.editPosts)) {
       return res.status(403).json({ error: 'Not authorized to update this post' });
     }
     
@@ -347,6 +351,21 @@ router.put('/:id', auth, async (req, res) => {
     
     // Populate author information
     await post.populate('author', 'username');
+    
+    // If a mod is editing someone else's post, send a notification to the author
+    if (user.isMod && post.author.toString() !== req.user.id) {
+      const postAuthor = await User.findById(post.author);
+      if (postAuthor) {
+        postAuthor.notifications.push({
+          type: 'suggestion',
+          targetId: post._id,
+          targetType: 'post',
+          message: `Moderator ${user.username} has edited your post "${post.title}"`,
+          postSlug: post.slug
+        });
+        await postAuthor.save();
+      }
+    }
     
     res.json(post);
   } catch (err) {

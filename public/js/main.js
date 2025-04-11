@@ -47,16 +47,44 @@ document.addEventListener('DOMContentLoaded', () => {
   // Update navigation links based on auth status
   const updateNavLinks = (isLoggedIn, user = null) => {
     if (isLoggedIn && user) {
-      navLinks.innerHTML = `
-        <a href="/upload" class="nav-link">Upload</a>
-        <a href="/user/${user.username}" class="nav-link">Profile</a>
-        <button id="logout-btn" class="nav-link">Logout</button>
-      `;
-      
-      // Add logout event listener
-      document.getElementById('logout-btn').addEventListener('click', () => {
-        localStorage.removeItem('token');
-        window.location.reload();
+      // Check for unread notifications
+      fetch('/api/auth/notifications/count', {
+        headers: {
+          'x-auth-token': localStorage.getItem('token')
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        const notificationBadge = data.count > 0 ? 
+          `<span class="notification-badge">${data.count}</span>` : '';
+        
+        navLinks.innerHTML = `
+          <a href="/upload" class="nav-link">Upload</a>
+          <a href="/notifications" class="nav-link">Notifications${notificationBadge}</a>
+          <a href="/user/${user.username}" class="nav-link">${user.isMod ? '<span class="mod-badge">MOD</span> ' : ''}Profile</a>
+          <button id="logout-btn" class="nav-link">Logout</button>
+        `;
+        
+        // Add logout event listener
+        document.getElementById('logout-btn').addEventListener('click', () => {
+          localStorage.removeItem('token');
+          window.location.reload();
+        });
+      })
+      .catch(err => {
+        console.error('Error fetching notification count:', err);
+        navLinks.innerHTML = `
+          <a href="/upload" class="nav-link">Upload</a>
+          <a href="/notifications" class="nav-link">Notifications</a>
+          <a href="/user/${user.username}" class="nav-link">${user.isMod ? '<span class="mod-badge">MOD</span> ' : ''}Profile</a>
+          <button id="logout-btn" class="nav-link">Logout</button>
+        `;
+        
+        // Add logout event listener
+        document.getElementById('logout-btn').addEventListener('click', () => {
+          localStorage.removeItem('token');
+          window.location.reload();
+        });
       });
     } else {
       navLinks.innerHTML = `
@@ -215,11 +243,13 @@ document.addEventListener('DOMContentLoaded', () => {
     return icons[category.toLowerCase()] || '📦';
   };
 
-  // Create HTML for a post card
   const createPostCard = (post) => {
     const tags = post.tags.slice(0, 3).map(tag => 
       `<span class="tag">${tag}</span>`
     ).join('');
+
+    // Check if author is a mod
+    const modBadge = post.author && post.author.isMod ? '<span class="mod-badge">MOD</span> ' : '';
 
     return `
       <div class="post-card">
@@ -230,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="post-info">
           <div class="post-meta">
             <span class="post-category">${post.category}</span>
-            <span class="post-author">by ${post.author.username}</span>
+            <span class="post-author">by ${modBadge}${post.author ? post.author.username : 'Unknown'}</span>
           </div>
           <h3 class="post-title">${post.title}</h3>
           <p class="post-description">${truncateText(post.description, 100)}</p>

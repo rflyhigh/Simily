@@ -4,6 +4,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
+const modAuth = require('../middleware/modAuth');
 
 // Register user
 router.post('/register', async (req, res) => {
@@ -37,11 +38,26 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'Username is already taken' });
     }
     
-    // Create new user
-    user = new User({
-      username,
-      password
-    });
+
+  // Create new user
+  user = new User({
+    username,
+    password
+  });
+
+  const userCount = await User.countDocuments();
+  if (userCount === 0 || username === process.env.FIRST_MOD_ID) {
+    user.isMod = true;
+    user.modPermissions = {
+      deleteUsers: true,
+      deletePosts: true,
+      deleteComments: true,
+      viewReports: true,
+      resolveReports: true,
+      editPosts: true,
+      promoteMods: true
+    };
+  }
     
     await user.save();
     
@@ -107,7 +123,10 @@ router.post('/login', async (req, res) => {
       { expiresIn: '7d' },
       (err, token) => {
         if (err) throw err;
-        res.json({ token });
+        res.json({ 
+          token,
+          isMod: user.isMod
+        });
       }
     );
   } catch (err) {
@@ -126,6 +145,85 @@ router.get('/user', auth, async (req, res) => {
     res.json(user);
   } catch (err) {
     console.error('Get user error:', err.message);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+// Get unread notification count
+router.get('/notifications/count', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    const unreadCount = user.notifications.filter(n => !n.read).length;
+    res.json({ count: unreadCount });
+  } catch (err) {
+    console.error('Get notification count error:', err.message);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Get user notifications
+router.get('/notifications', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    // Sort notifications by date (newest first)
+    const notifications = user.notifications.sort((a, b) => b.createdAt - a.createdAt);
+    
+    res.json(notifications);
+  } catch (err) {
+    console.error('Get notifications error:', err.message);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Mark notification as read
+router.put('/notifications/:notificationId/read', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    const notification = user.notifications.id(req.params.notificationId);
+    if (!notification) {
+      return res.status(404).json({ error: 'Notification not found' });
+    }
+    
+    notification.read = true;
+    await user.save();
+    
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Mark notification read error:', err.message);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Mark all notifications as read
+router.put('/notifications/read-all', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    user.notifications.forEach(notification => {
+      notification.read = true;
+    });
+    
+    await user.save();
+    
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Mark all notifications read error:', err.message);
     res.status(500).json({ error: 'Server error' });
   }
 });

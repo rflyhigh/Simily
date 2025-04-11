@@ -22,6 +22,7 @@
   
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="/css/detail.css">
+  <link rel="stylesheet" href="/css/upload.css">
   <link rel="icon" href="/img/favicon.ico">
   <link rel="canonical" href="">
 </head>
@@ -53,6 +54,22 @@
         <!-- Post details will be loaded here -->
       </article>
 
+      <section class="post-logs-section hidden" id="post-logs-section">
+        <h2>Post Change Logs</h2>
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="pending-suggestions">Pending Suggestions</button>
+          <button class="tab-btn" data-tab="approved-suggestions">Approved Changes</button>
+        </div>
+        
+        <div id="pending-suggestions" class="tab-content">
+          <!-- Pending suggestions will be loaded here -->
+        </div>
+        
+        <div id="approved-suggestions" class="tab-content hidden">
+          <!-- Approved suggestions will be loaded here -->
+        </div>
+      </section>
+
       <section class="comments-section">
         <h2>Comments</h2>
         
@@ -76,29 +93,121 @@
     </div>
   </footer>
 
-  <script src="/js/detail.js"></script>
   <!-- Report Modal -->
-<div id="report-modal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3>Report Content</h3>
-      <button class="modal-close">&times;</button>
-    </div>
-    <div class="modal-body">
-      <form id="report-form">
-        <input type="hidden" id="report-target-id">
-        <input type="hidden" id="report-type">
-        <div class="form-group">
-          <label for="report-reason">Please provide a reason for reporting this content:</label>
-          <textarea id="report-reason" name="reason" rows="4" required></textarea>
-        </div>
-        <div class="form-actions">
-          <button type="submit" class="btn">Submit Report</button>
-          <button type="button" class="btn btn-secondary" id="cancel-report">Cancel</button>
-        </div>
-      </form>
+  <div id="report-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Report Content</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="report-form">
+          <input type="hidden" id="report-target-id">
+          <input type="hidden" id="report-type">
+          <div class="form-group">
+            <label for="report-reason">Please provide a reason for reporting this content:</label>
+            <textarea id="report-reason" name="reason" rows="4" required></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn">Submit Report</button>
+            <button type="button" class="btn btn-secondary" id="cancel-report">Cancel</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-</div>
+
+  <!-- Link Report Modal -->
+  <div id="link-report-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Report Link</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="link-report-form">
+          <input type="hidden" id="link-report-post-id">
+          <input type="hidden" id="link-report-group-index">
+          <input type="hidden" id="link-report-link-index">
+          <div class="form-group">
+            <label for="link-report-reason">Please provide a reason for reporting this link:</label>
+            <textarea id="link-report-reason" name="reason" rows="4" required></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn">Submit Report</button>
+            <button type="button" class="btn btn-secondary" id="cancel-link-report">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Suggest Changes Modal -->
+  <div id="suggest-modal" class="modal">
+    <div class="modal-content modal-lg">
+      <div class="modal-header">
+        <h3>Suggest Changes</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="suggest-form">
+          <input type="hidden" id="suggest-post-id">
+          
+          <div class="form-group">
+            <label for="suggest-title">Title</label>
+            <input type="text" id="suggest-title" name="title" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="suggest-description">Description</label>
+            <textarea id="suggest-description" name="description" rows="6" required></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="suggest-category">Category</label>
+            <select id="suggest-category" name="category" required>
+              <option value="">Select a category</option>
+              <option value="software">Software</option>
+              <option value="game">Game</option>
+              <option value="movie">Movie</option>
+              <option value="music">Music</option>
+              <option value="book">Book</option>
+              <option value="tutorial">Tutorial</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="suggest-tags">Tags (comma separated)</label>
+            <input type="text" id="suggest-tags" name="tags">
+          </div>
+          
+          <div class="form-group">
+            <label for="suggest-image-url">Image URL</label>
+            <input type="url" id="suggest-image-url" name="imageUrl" required>
+          </div>
+          
+          <div class="form-group">
+            <label>Download Groups</label>
+            <div id="suggest-download-groups-container">
+              <!-- Download groups will be added here -->
+            </div>
+            <button type="button" id="suggest-add-group-btn" class="btn-small">Add Group</button>
+          </div>
+          
+          <div class="form-group">
+            <label for="suggest-message">Explain your changes</label>
+            <textarea id="suggest-message" name="message" rows="3" required placeholder="Please explain why you're suggesting these changes"></textarea>
+          </div>
+          
+          <div class="form-actions">
+            <button type="submit" class="btn">Submit Suggestion</button>
+            <button type="button" id="cancel-suggest-btn" class="btn btn-secondary">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script src="/js/detail.js"></script>
 </body>
 </html>

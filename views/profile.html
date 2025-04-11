@@ -86,28 +86,29 @@
     </div>
   </footer>
 
-  <script src="/js/profile.js"></script>
   <!-- Report User Modal -->
-<div id="report-user-modal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3>Report User</h3>
-      <button class="modal-close">&times;</button>
-    </div>
-    <div class="modal-body">
-      <form id="report-user-form">
-        <input type="hidden" id="report-user-id">
-        <div class="form-group">
-          <label for="report-user-reason">Please provide a reason for reporting this user:</label>
-          <textarea id="report-user-reason" name="reason" rows="4" required></textarea>
-        </div>
-        <div class="form-actions">
-          <button type="submit" class="btn">Submit Report</button>
-          <button type="button" class="btn btn-secondary" id="cancel-user-report">Cancel</button>
-        </div>
-      </form>
+  <div id="report-user-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Report User</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="report-user-form">
+          <input type="hidden" id="report-user-id">
+          <div class="form-group">
+            <label for="report-user-reason">Please provide a reason for reporting this user:</label>
+            <textarea id="report-user-reason" name="reason" rows="4" required></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn">Submit Report</button>
+            <button type="button" class="btn btn-secondary" id="cancel-user-report">Cancel</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-</div>
+
+  <script src="/js/profile.js"></script>
 </body>
 </html>
