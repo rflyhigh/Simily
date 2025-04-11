@@ -825,7 +825,6 @@ footer {
   letter-spacing: 0.5px;
 }
 
-/* Notification badge in nav */
 .notification-badge {
   background-color: var(--error-color);
   color: white;

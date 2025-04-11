@@ -420,23 +420,6 @@
   color: var(--accent-color);
 }
 
-/* Notification badge in nav */
-.notification-badge {
-  display: inline-block;
-  background-color: var(--error-color);
-  color: white;
-  font-size: 10px;
-  font-weight: 600;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  top: -5px;
-  right: -5px;
-}
 
 .nav-link {
   position: relative;
@@ -584,21 +567,50 @@
 .view-btn:hover {
   background-color: var(--accent-hover);
 }
-
-/* Make sure notification badge is properly positioned */
-.notification-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background-color: var(--error-color);
-  color: white;
-  font-size: 10px;
-  font-weight: 600;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  z-index: 1; /* Ensure badge appears above other elements */
-}
+/* For the navigation notification badge */
+.nav-link .notification-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: var(--error-color);
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    z-index: 1;
+  }
+  
+  /* For the notification item badges in the notifications page */
+  .notification-item .notification-badge {
+    width: 4px;
+    border-radius: 2px;
+    margin-right: 15px;
+    flex-shrink: 0;
+  }
+  
+  /* Hide the notification badge for read notifications */
+  .notification-item:not(.unread) .notification-badge {
+    opacity: 0.3; /* Make it less prominent instead of completely hiding */
+  }
+  
+  /* Specific type colors */
+  .notification-badge.notification-suggestion {
+    background-color: var(--accent-color);
+  }
+  
+  .notification-badge.notification-report {
+    background-color: var(--error-color);
+  }
+  
+  .notification-badge.notification-approval {
+    background-color: var(--success-color);
+  }
+  
+  .notification-badge.notification-promotion {
+    background-color: #9c27b0;
+  }
