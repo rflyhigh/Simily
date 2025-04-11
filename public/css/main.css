@@ -1,7 +1,7 @@
 /* FILE: /public/css/main.css */
 @font-face {
   font-family: 'Space Grotesk';
-  src: url('/sp2.woff2') format('woff2');
+  src: url('https://raw.githubusercontent.com/rflyhigh/Simily/refs/heads/master/sp2.woff2') format('woff2');
   font-weight: 300;
   font-style: normal;
   font-display: swap;
