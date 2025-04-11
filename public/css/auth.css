@@ -6,8 +6,18 @@
   border-radius: 16px;
   padding: 40px;
   box-shadow: var(--card-shadow);
-  animation: fadeIn 0.7s ease-out;
+  animation: fadeInUp 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transform-origin: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid transparent;
 }
+
+.auth-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  border-color: rgba(108, 92, 231, 0.1);
+}
+
 .auth-container h2 {
   font-size: 28px;
   font-weight: 700;
@@ -26,10 +36,16 @@
   height: 3px;
   background: linear-gradient(to right, var(--accent-color), var(--accent-secondary));
   border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.auth-container h2:hover::after {
+  width: 100%;
 }
 
 .form-group {
   margin-bottom: 25px;
+  position: relative;
 }
 
 .form-group label {
@@ -38,6 +54,11 @@
   color: var(--text-color);
   font-weight: 500;
   font-size: 16px;
+  transition: color 0.2s ease;
+}
+
+.form-group:focus-within label {
+  color: var(--accent-color);
 }
 
 .form-group input {
@@ -48,13 +69,15 @@
   background-color: var(--bg-tertiary);
   color: var(--text-color);
   font-size: 16px;
-  transition: all var(--transition-medium);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .form-group input:focus {
   outline: none;
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+  box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2), inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
 }
 
 .btn {
@@ -67,7 +90,7 @@
   cursor: pointer;
   font-size: 16px;
   font-weight: 600;
-  transition: all var(--transition-medium);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
   position: relative;
   overflow: hidden;
@@ -106,18 +129,37 @@
   margin-top: 25px;
   text-align: center;
   color: var(--text-secondary);
+  animation: fadeInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .auth-links a {
   color: var(--accent-color);
   text-decoration: none;
   font-weight: 600;
-  transition: all var(--transition-medium);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  padding: 2px 4px;
+}
+
+.auth-links a::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, var(--accent-color), var(--accent-secondary));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
 }
 
 .auth-links a:hover {
   color: var(--accent-hover);
-  text-decoration: underline;
+}
+
+.auth-links a:hover::after {
+  transform: scaleX(1);
 }
 
 .error-message {
@@ -127,11 +169,30 @@
   border-radius: 8px;
   margin-bottom: 20px;
   border-left: 4px solid var(--error-color);
-  animation: fadeIn 0.5s ease-out;
+  animation: shakeX 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+  transform-origin: center;
+}
+
+@keyframes shakeX {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
 }
 
 .hidden {
   display: none;
+}
+
+/* New animations */
+@keyframes fadeInUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
 }
 
 /* Responsive styles */
@@ -139,6 +200,12 @@
   .auth-container {
     padding: 30px;
     margin: 30px 20px;
+    max-width: none;
+    width: auto;
+  }
+  
+  .auth-container h2 {
+    font-size: 24px;
   }
 }
 
@@ -146,17 +213,36 @@
   .auth-container {
     padding: 20px;
     margin: 20px 15px;
+    border-radius: 12px;
   }
   
   .auth-container h2 {
-    font-size: 24px;
+    font-size: 22px;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .auth-container h2::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .form-group label {
+    font-size: 14px;
   }
   
   .form-group input {
     padding: 12px 15px;
+    font-size: 14px;
   }
   
   .btn {
     padding: 12px 20px;
+    font-size: 15px;
+  }
+  
+  .error-message {
+    padding: 12px;
+    font-size: 14px;
   }
 }
