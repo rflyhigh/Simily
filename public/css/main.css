@@ -731,3 +731,83 @@ footer {
     gap: 10px;
   }
 }
+/* Fix for search page tag styling */
+.tag-filter-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 15px 0;
+}
+
+.tag-filter-list .tag {
+  padding: 6px 12px;
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 300;
+  transition: all 0.3s ease;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  display: inline-block;
+  border: 1px solid var(--border-color);
+}
+
+.tag-filter-list .tag:hover {
+  background-color: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+}
+
+/* Active tag styling */
+.tag-filter-list .tag.active {
+  background-color: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+}
+
+/* Add spacing between tag sections and results */
+#tag-filters {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Fix for the search title with tags */
+#search-title {
+  margin-bottom: 15px;
+  font-size: 22px;
+  font-weight: 300;
+  color: var(--text-color);
+  letter-spacing: 0.02em;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .tag-filter-list {
+    gap: 6px;
+    margin: 12px 0;
+  }
+  
+  .tag-filter-list .tag {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tag-filter-list {
+    gap: 5px;
+    margin: 10px 0;
+  }
+  
+  .tag-filter-list .tag {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  
+  #search-title {
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+}
